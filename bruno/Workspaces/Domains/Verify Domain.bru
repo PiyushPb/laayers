@@ -1,0 +1,20 @@
+meta {
+  name: Verify Domain
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/verify
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  domainId: x0bawk6nkacho7pz24djntoj
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

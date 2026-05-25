@@ -1,0 +1,19 @@
+meta {
+  name: Revoke Session
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/auth/sessions/:sessionId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  sessionId: REPLACE_WITH_SESSION_ID
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

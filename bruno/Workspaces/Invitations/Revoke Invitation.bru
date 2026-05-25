@@ -1,0 +1,20 @@
+meta {
+  name: Revoke Invitation
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/invitations/:invitationId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  invitationId: REPLACE_WITH_INVITATION_ID
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

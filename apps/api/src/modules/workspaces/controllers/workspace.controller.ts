@@ -106,9 +106,34 @@ export const updateMemberRole = async (req: Request, res: Response) => {
   const { memberId } = req.params;
   const { role } = req.body;
 
+  const [memberToUpdate] = await db.select()
+    .from(workspaceMembers)
+    .where(and(eq(workspaceMembers.id, memberId), eq(workspaceMembers.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!memberToUpdate) {
+    throw new NotFoundError('Member not found');
+  }
+
+  // Security: Admins cannot change roles of owners
+  if (req.member.role === 'admin' && memberToUpdate.role === 'owner') {
+    throw new ValidationError('Admins cannot modify owner roles');
+  }
+
+  // Safety: Prevent downgrading the last owner
+  if (memberToUpdate.role === 'owner' && role !== 'owner') {
+    const owners = await db.select()
+      .from(workspaceMembers)
+      .where(and(eq(workspaceMembers.workspaceId, req.workspace.id), eq(workspaceMembers.role, 'owner')));
+
+    if (owners.length <= 1) {
+      throw new ValidationError('Cannot downgrade the only owner of the workspace. Please transfer ownership first.');
+    }
+  }
+
   await db.update(workspaceMembers)
     .set({ role })
-    .where(and(eq(workspaceMembers.id, memberId), eq(workspaceMembers.workspaceId, req.workspace.id)));
+    .where(eq(workspaceMembers.id, memberId));
 
   res.status(200).json(sendSuccess(null, 'Role updated'));
 };
@@ -116,8 +141,76 @@ export const updateMemberRole = async (req: Request, res: Response) => {
 export const removeMember = async (req: Request, res: Response) => {
   const { memberId } = req.params;
 
+  const [memberToRemove] = await db.select()
+    .from(workspaceMembers)
+    .where(and(eq(workspaceMembers.id, memberId), eq(workspaceMembers.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!memberToRemove) {
+    throw new NotFoundError('Member not found');
+  }
+
+  // Security: Admins cannot remove owners
+  if (req.member.role === 'admin' && memberToRemove.role === 'owner') {
+    throw new ValidationError('Admins cannot remove owners');
+  }
+
+  // Safety: Prevent deleting/removing the last owner
+  if (memberToRemove.role === 'owner') {
+    const owners = await db.select()
+      .from(workspaceMembers)
+      .where(and(eq(workspaceMembers.workspaceId, req.workspace.id), eq(workspaceMembers.role, 'owner')));
+
+    if (owners.length <= 1) {
+      if (memberToRemove.userId === req.user.id) {
+        throw new ValidationError('You cannot remove yourself because you are the only owner. Please transfer ownership first.');
+      }
+      throw new ValidationError('Cannot remove the only owner of the workspace. Please transfer ownership first.');
+    }
+  }
+
   await db.delete(workspaceMembers)
-    .where(and(eq(workspaceMembers.id, memberId), eq(workspaceMembers.workspaceId, req.workspace.id)));
+    .where(eq(workspaceMembers.id, memberId));
 
   res.status(200).json(sendSuccess(null, 'Member removed'));
+};
+
+export const transferOwnership = async (req: Request, res: Response) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    throw new ValidationError('Target userId is required');
+  }
+
+  const [targetMember] = await db.select()
+    .from(workspaceMembers)
+    .where(and(eq(workspaceMembers.workspaceId, req.workspace.id), eq(workspaceMembers.userId, userId)))
+    .limit(1);
+
+  if (!targetMember) {
+    throw new ValidationError('Target user is not a member of this workspace');
+  }
+
+  if (targetMember.role === 'owner') {
+    throw new ValidationError('Target user is already the owner');
+  }
+
+  await db.transaction(async (tx) => {
+    // 1. Demote current owner to admin
+    await tx.update(workspaceMembers)
+      .set({ role: 'admin' })
+      .where(and(eq(workspaceMembers.workspaceId, req.workspace.id), eq(workspaceMembers.userId, req.user.id)));
+
+    // 2. Promote target member to owner
+    await tx.update(workspaceMembers)
+      .set({ role: 'owner' })
+      .where(eq(workspaceMembers.id, targetMember.id));
+
+    // 3. Update workspaces table ownerId
+    await tx.update(workspaces)
+      .set({ ownerId: userId })
+      .where(eq(workspaces.id, req.workspace.id));
+  });
+
+  res.status(200).json(sendSuccess(null, 'Workspace ownership transferred successfully'));
 };

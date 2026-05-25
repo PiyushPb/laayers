@@ -1,0 +1,33 @@
+meta {
+  name: Update Settings
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/settings
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "branding": {
+      "logo": "https://example.com/logo.png",
+      "primaryColor": "#1A73E8",
+      "accentColor": "#34A853"
+    },
+    "preferences": {
+      "timezone": "America/New_York",
+      "language": "en"
+    }
+  }
+}

@@ -11,6 +11,7 @@ declare global {
       user?: any;
       workspace?: any;
       member?: any;
+      sessionId?: string;
     }
   }
 }
@@ -30,7 +31,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       throw new UnauthorizedError('Please log in to access this resource');
     }
 
-    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as { userId: string };
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as { userId: string; sessionId?: string };
 
     const userRecord = await db.select().from(users).where(eq(users.id, decoded.userId)).limit(1);
 
@@ -39,6 +40,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     }
 
     req.user = userRecord[0];
+    req.sessionId = decoded.sessionId;
     next();
   } catch (error) {
     next(new UnauthorizedError('Invalid or expired token'));

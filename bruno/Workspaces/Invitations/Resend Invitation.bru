@@ -1,0 +1,20 @@
+meta {
+  name: Resend Invitation
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/invitations/:invitationId/resend
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  invitationId: REPLACE_WITH_INVITATION_ID
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

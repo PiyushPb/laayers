@@ -1,0 +1,21 @@
+meta {
+  name: Update My Avatar
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users/me/avatar
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "avatarUrl": "https://example.com/avatar.png"
+  }
+}

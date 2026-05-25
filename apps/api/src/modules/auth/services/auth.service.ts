@@ -2,7 +2,7 @@ import { db, users, workspaces, workspaceMembers, workspaceSettings, workspaceQu
 import { hashPassword, comparePassword, generateRandomToken, hashToken, UnauthorizedError, ValidationError, NotFoundError } from '@layers/shared';
 import jwt from 'jsonwebtoken';
 import { env } from '../../../config/env';
-import { eq } from 'drizzle-orm';
+import { eq, and, not } from 'drizzle-orm';
 import crypto from 'crypto';
 import { EmailService } from './email.service';
 
@@ -90,7 +90,6 @@ export class AuthService {
   }
 
   static async createSessionAndTokens(userId: string, ipAddress: string, userAgent: string) {
-    const accessToken = jwt.sign({ userId }, env.JWT_ACCESS_SECRET, { expiresIn: env.ACCESS_TOKEN_EXPIRES_IN as any });
     const refreshToken = generateRandomToken();
     const refreshTokenHash = hashToken(refreshToken);
 
@@ -101,6 +100,12 @@ export class AuthService {
       userAgent,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     }).returning();
+
+    const accessToken = jwt.sign(
+      { userId, sessionId: session.id },
+      env.JWT_ACCESS_SECRET,
+      { expiresIn: env.ACCESS_TOKEN_EXPIRES_IN as any }
+    );
 
     return {
       accessToken,
@@ -204,5 +209,57 @@ export class AuthService {
     }).where(eq(users.id, user.id));
 
     await EmailService.sendEmailVerification(user.email, verifyToken);
+  }
+
+  static async listSessions(userId: string) {
+    return await db
+      .select({
+        id: sessions.id,
+        ipAddress: sessions.ipAddress,
+        userAgent: sessions.userAgent,
+        expiresAt: sessions.expiresAt,
+        createdAt: sessions.createdAt,
+      })
+      .from(sessions)
+      .where(eq(sessions.userId, userId));
+  }
+
+  static async revokeSession(userId: string, sessionId: string) {
+    const sessionRecords = await db
+      .select()
+      .from(sessions)
+      .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)))
+      .limit(1);
+    const session = sessionRecords[0];
+
+    if (!session) {
+      throw new NotFoundError('Session not found or unauthorized');
+    }
+
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+  }
+
+  static async logoutAll(userId: string, currentSessionId?: string) {
+    if (currentSessionId) {
+      await db
+        .delete(sessions)
+        .where(
+          and(
+            eq(sessions.userId, userId),
+            not(eq(sessions.id, currentSessionId))
+          )
+        );
+    } else {
+      await db.delete(sessions).where(eq(sessions.userId, userId));
+    }
+  }
+
+  static async checkEmail(email: string) {
+    const userRecords = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    return userRecords.length > 0;
   }
 }

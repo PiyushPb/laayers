@@ -1,0 +1,25 @@
+meta {
+  name: Transfer Ownership
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/transfer-ownership
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "userId": "REPLACE_WITH_TARGET_USER_ID"
+  }
+}

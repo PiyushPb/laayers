@@ -1,0 +1,20 @@
+meta {
+  name: Delete Domain
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  domainId: REPLACE_WITH_DOMAIN_ID
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

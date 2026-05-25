@@ -1,0 +1,26 @@
+meta {
+  name: Update Domain
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  domainId: REPLACE_WITH_DOMAIN_ID
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "primary": true
+  }
+}

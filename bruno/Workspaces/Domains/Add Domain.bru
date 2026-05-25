@@ -1,0 +1,26 @@
+meta {
+  name: Add Domain
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "domain": "portal.mycompany.com",
+    "primary": false
+  }
+}

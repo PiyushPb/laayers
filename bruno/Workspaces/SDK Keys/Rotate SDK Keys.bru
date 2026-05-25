@@ -1,0 +1,19 @@
+meta {
+  name: Rotate SDK Keys
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys/rotate
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
