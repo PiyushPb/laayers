@@ -1,0 +1,11 @@
+meta {
+  name: Get Workspace Members
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/workspaces/{{workspaceId}}/members
+  body: none
+  auth: none
+}

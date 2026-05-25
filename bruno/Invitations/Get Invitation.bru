@@ -1,0 +1,15 @@
+meta {
+  name: Get Invitation
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/invitations/:token
+  body: none
+  auth: none
+}
+
+params:path {
+  token: 9cfee59a83ca046775a723431f4a9a4330691612e28ae3b7388e04835d8a110a
+}

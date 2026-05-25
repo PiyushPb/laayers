@@ -1,0 +1,17 @@
+meta {
+  name: Verify Email
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/verify-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "49e6181457313c1e49765645bbbaa3eabe2fc102a5ecf5487030b348be6dd415"
+  }
+}

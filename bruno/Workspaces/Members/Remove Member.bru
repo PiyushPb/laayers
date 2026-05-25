@@ -1,0 +1,15 @@
+meta {
+  name: Remove Member
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/workspaces/{{workspaceId}}/members/:memberId
+  body: none
+  auth: none
+}
+
+params:path {
+  memberId: REPLACE_WITH_MEMBER_ID
+}

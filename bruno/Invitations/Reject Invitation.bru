@@ -1,0 +1,17 @@
+meta {
+  name: Reject Invitation
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/invitations/reject
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "REPLACE_WITH_INVITATION_TOKEN"
+  }
+}
