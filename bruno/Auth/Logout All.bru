@@ -4,12 +4,8 @@ meta {
   seq: 12
 }
 
-post {
-  url: {{baseUrl}}/api/v1/auth/logout-all
+delete {
+  url: {{baseUrl}}/api/v1/auth/sessions
   body: none
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{accessToken}}
+  auth: none
 }

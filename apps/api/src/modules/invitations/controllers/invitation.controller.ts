@@ -18,8 +18,9 @@ export const getInvitation = async (req: Request, res: Response) => {
     },
     inviter: {
       id: users.id,
-      name: users.name,
       email: users.email,
+      name: users.name,
+      avatarUrl: users.avatarUrl,
     }
   })
   .from(workspaceInvitations)

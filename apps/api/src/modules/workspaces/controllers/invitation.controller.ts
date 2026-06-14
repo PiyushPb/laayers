@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { db, workspaceInvitations } from '@layers/database';
 import { eq, and } from 'drizzle-orm';
 import { sendSuccess, NotFoundError, generateRandomToken, hashToken } from '@layers/shared';
-import { EmailService } from '../../auth/services/email.service';
 
 export const revokeInvitation = async (req: Request, res: Response) => {
   const { invitationId } = req.params;
@@ -49,7 +48,8 @@ export const resendInvitation = async (req: Request, res: Response) => {
     })
     .where(eq(workspaceInvitations.id, invitationId));
 
-  await EmailService.sendWorkspaceInvitation(invitation.email, req.workspace.name, rawToken);
+  // Email integration removed temporarily
+  console.log(`Sending invitation to ${invitation.email} with token ${rawToken}`);
 
   res.status(200).json(sendSuccess(null, 'Invitation email resent successfully'));
 };

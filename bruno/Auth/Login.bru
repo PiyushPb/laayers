@@ -16,9 +16,3 @@ body:json {
     "password": "Piyush1234@"
   }
 }
-
-script:post-response {
-  if (res.status === 200 && res.body.data) {
-    bru.setEnvVar("accessToken", res.body.data.accessToken);
-  }
-}

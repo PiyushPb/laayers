@@ -1,0 +1,25 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "piyushpardeshi2002@gmail.com",
+    "password": "Piyush1234@",
+    "name": "Piyush Pardeshi",
+    "workspaceName": "My Awesome Workspace",
+    "marketingEmailsEnabled": true,
+    "consents": [
+      { "consentType": "terms", "version": "v1.0" },
+      { "consentType": "privacy", "version": "v1.0" }
+    ]
+  }
+}

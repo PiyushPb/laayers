@@ -1,0 +1,19 @@
+meta {
+  name: Exchange Code
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/exchange-code
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "auth-code-here",
+    "clientId": "test-client",
+    "redirectUri": "http://localhost:3000/callback"
+  }
+}

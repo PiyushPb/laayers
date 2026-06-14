@@ -51,12 +51,5 @@ export const getMyWorkspaces = async (req: Request, res: Response) => {
 };
 
 export const updateMyAvatar = async (req: Request, res: Response) => {
-  // Scaffold: simply set a simulated or provided avatar URL in the DB
-  const avatarUrl = req.body.avatarUrl || `https://avatar.vercel.sh/${encodeURIComponent(req.user.name)}`;
-
-  await db.update(users)
-    .set({ avatarUrl })
-    .where(eq(users.id, req.user.id));
-
-  res.status(200).json(sendSuccess({ avatarUrl }, 'Avatar updated successfully (scaffold)'));
+  res.status(200).json(sendSuccess(null, 'Avatar update disabled'));
 };

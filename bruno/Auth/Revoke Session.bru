@@ -5,15 +5,11 @@ meta {
 }
 
 delete {
-  url: {{baseUrl}}/api/v1/auth/sessions/:sessionId
+  url: {{baseUrl}}/api/v1/auth/sessions/:id
   body: none
-  auth: bearer
+  auth: none
 }
 
 params:path {
-  sessionId: REPLACE_WITH_SESSION_ID
-}
-
-auth:bearer {
-  token: {{accessToken}}
+  id: REPLACE_WITH_SESSION_ID
 }

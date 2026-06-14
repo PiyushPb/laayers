@@ -1,0 +1,18 @@
+meta {
+  name: Add Consent
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/consents
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "consentType": "terms",
+    "version": "1.0"
+  }
+}
