@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
 import { db, workspaceModules, auditLogs } from '@layers/database';
 import { eq, and } from 'drizzle-orm';
-import { sendSuccess, ValidationError } from '@layers/shared';
-
-const ALLOWED_MODULES = ['blogs', 'chat'];
+import { sendSuccess, ValidationError, ALLOWED_MODULES } from '@layers/shared';
 
 export const listModules = async (req: Request, res: Response) => {
   const dbModules = await db
@@ -28,7 +26,7 @@ export const updateModule = async (req: Request, res: Response) => {
   const { moduleKey } = req.params;
   const { enabled } = req.body;
 
-  if (!ALLOWED_MODULES.includes(moduleKey)) {
+  if (!(ALLOWED_MODULES as readonly string[]).includes(moduleKey)) {
     throw new ValidationError(`Module '${moduleKey}' does not exist`);
   }
 
