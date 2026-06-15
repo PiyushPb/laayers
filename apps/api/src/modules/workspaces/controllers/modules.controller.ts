@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { db, workspaceModules } from '@layers/database';
+import { db, workspaceModules, auditLogs } from '@layers/database';
 import { eq, and } from 'drizzle-orm';
 import { sendSuccess, ValidationError } from '@layers/shared';
 
@@ -53,6 +53,15 @@ export const updateModule = async (req: Request, res: Response) => {
       })
       .returning();
 
+    await db.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+      action: 'module.updated',
+      entityType: 'module',
+      entityId: inserted.id,
+      metadata: { moduleKey, enabled },
+    });
+
     return res.status(200).json(sendSuccess({ module: inserted }, 'Module status updated'));
   }
 
@@ -61,6 +70,15 @@ export const updateModule = async (req: Request, res: Response) => {
     .set({ enabled })
     .where(eq(workspaceModules.id, existing.id))
     .returning();
+
+  await db.insert(auditLogs).values({
+    workspaceId: req.workspace.id,
+    userId: req.user.id,
+    action: 'module.updated',
+    entityType: 'module',
+    entityId: updated.id,
+    metadata: { moduleKey, enabled },
+  });
 
   res.status(200).json(sendSuccess({ module: updated }, 'Module status updated'));
 };

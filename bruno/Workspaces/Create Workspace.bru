@@ -19,3 +19,10 @@ body:json {
     "name": "New Workspace"
   }
 }
+
+script:post-response {
+  if (res.getBody().data && res.getBody().data.workspace && res.getBody().data.workspace.id) {
+    bru.setVar("workspaceId", res.getBody().data.workspace.id);
+    bru.setEnvVar("workspaceId", res.getBody().data.workspace.id);
+  }
+}

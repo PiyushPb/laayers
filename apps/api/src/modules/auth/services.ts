@@ -58,27 +58,29 @@ export const AuthService = {
         );
       }
 
-      const baseSlug = generateSlug(payload.workspaceName) || 'workspace';
-      let slug = baseSlug;
-      while (true) {
-        const existing = await tx.select().from(workspaces).where(eq(workspaces.slug, slug)).limit(1);
-        if (existing.length === 0) {
-          break;
+      if (payload.workspaceName) {
+        const baseSlug = generateSlug(payload.workspaceName) || 'workspace';
+        let slug = baseSlug;
+        while (true) {
+          const existing = await tx.select().from(workspaces).where(eq(workspaces.slug, slug)).limit(1);
+          if (existing.length === 0) {
+            break;
+          }
+          slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
         }
-        slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+
+        const [workspace] = await tx.insert(workspaces).values({
+          ownerId: newUser.id,
+          name: payload.workspaceName,
+          slug,
+        }).returning();
+
+        await tx.insert(workspaceMembers).values({
+          workspaceId: workspace.id,
+          userId: newUser.id,
+          role: 'owner',
+        });
       }
-
-      const [workspace] = await tx.insert(workspaces).values({
-        ownerId: newUser.id,
-        name: payload.workspaceName,
-        slug,
-      }).returning();
-
-      await tx.insert(workspaceMembers).values({
-        workspaceId: workspace.id,
-        userId: newUser.id,
-        role: 'owner',
-      });
 
       return newUser;
     });

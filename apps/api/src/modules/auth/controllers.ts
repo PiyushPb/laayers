@@ -33,7 +33,7 @@ export const AuthController = {
       const result = await AuthService.signup(payload, meta);
       setCookies(res, result.sessionToken, result.refreshToken);
 
-      res.json(sendSuccess({ message: 'Signup successful' }));
+      res.json(sendSuccess({ message: 'Signup successful', sessionToken: result.sessionToken }));
     } catch (error) {
       next(error);
     }
@@ -50,7 +50,7 @@ export const AuthController = {
       const result = await AuthService.login(payload, meta);
       setCookies(res, result.sessionToken, result.refreshToken);
 
-      res.json(sendSuccess({ message: 'Login successful' }));
+      res.json(sendSuccess({ message: 'Login successful', sessionToken: result.sessionToken }));
     } catch (error) {
       next(error);
     }
@@ -85,7 +85,7 @@ export const AuthController = {
       const result = await AuthService.refreshSession(refreshToken, meta);
       setCookies(res, result.sessionToken, result.refreshToken);
 
-      res.json(sendSuccess({ message: 'Session refreshed' }));
+      res.json(sendSuccess({ message: 'Session refreshed', sessionToken: result.sessionToken }));
     } catch (error) {
       clearCookies(res);
       next(error);

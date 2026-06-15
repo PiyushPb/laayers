@@ -89,6 +89,11 @@ export const rejectInvitation = async (req: Request, res: Response) => {
     throw new NotFoundError('Invitation not found');
   }
 
+  // Ensure the user rejecting is the one invited
+  if (req.user.email !== invitation.email) {
+    throw new ValidationError('This invitation was sent to a different email address');
+  }
+
   await db.delete(workspaceInvitations).where(eq(workspaceInvitations.id, invitation.id));
 
   res.status(200).json(sendSuccess(null, 'Invitation rejected'));

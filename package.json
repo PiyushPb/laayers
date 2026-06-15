@@ -10,6 +10,7 @@
     "db:migrate": "pnpm --filter @layers/database db:migrate",
     "db:push": "pnpm --filter @layers/database db:push",
     "db:studio": "pnpm --filter @layers/database db:studio",
+    "db:clean": "pnpm --filter @layers/database db:clean",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { db, workspaceSettings } from '@layers/database';
+import { db, workspaceSettings, auditLogs } from '@layers/database';
 import { eq } from 'drizzle-orm';
 import { sendSuccess } from '@layers/shared';
 
@@ -46,6 +46,16 @@ export const updateSettings = async (req: Request, res: Response) => {
         preferences: updatedPreferences,
       })
       .returning();
+
+    await db.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+      action: 'settings.updated',
+      entityType: 'settings',
+      entityId: req.workspace.id,
+      metadata: { branding: updatedBranding, preferences: updatedPreferences },
+    });
+
     return res.status(200).json(sendSuccess({ settings: newSettings }, 'Settings updated successfully'));
   }
 
@@ -57,6 +67,15 @@ export const updateSettings = async (req: Request, res: Response) => {
     })
     .where(eq(workspaceSettings.workspaceId, req.workspace.id))
     .returning();
+
+  await db.insert(auditLogs).values({
+    workspaceId: req.workspace.id,
+    userId: req.user.id,
+    action: 'settings.updated',
+    entityType: 'settings',
+    entityId: req.workspace.id,
+    metadata: { branding: updatedBranding, preferences: updatedPreferences },
+  });
 
   res.status(200).json(sendSuccess({ settings: updatedSettings }, 'Settings updated successfully'));
 };

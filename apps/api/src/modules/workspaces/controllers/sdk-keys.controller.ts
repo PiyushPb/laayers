@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { db, workspaceSdkKeys } from '@layers/database';
+import { db, workspaceSdkKeys, auditLogs } from '@layers/database';
 import { eq } from 'drizzle-orm';
 import { sendSuccess } from '@layers/shared';
 import crypto from 'crypto';
@@ -56,6 +56,15 @@ export const rotateSdkKeys = async (req: Request, res: Response) => {
       })
       .returning();
 
+    await db.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+      action: 'sdk_keys.rotated',
+      entityType: 'sdk_key',
+      entityId: req.workspace.id,
+      metadata: { publicKey: newPub },
+    });
+
     // On rotation, return the full unmasked keys
     return res.status(200).json(sendSuccess({
       publicKey: inserted.publicKey,
@@ -71,6 +80,15 @@ export const rotateSdkKeys = async (req: Request, res: Response) => {
     })
     .where(eq(workspaceSdkKeys.workspaceId, req.workspace.id))
     .returning();
+
+  await db.insert(auditLogs).values({
+    workspaceId: req.workspace.id,
+    userId: req.user.id,
+    action: 'sdk_keys.rotated',
+    entityType: 'sdk_key',
+    entityId: req.workspace.id,
+    metadata: { publicKey: newPub },
+  });
 
   res.status(200).json(sendSuccess({
     publicKey: updated.publicKey,

@@ -14,3 +14,4 @@ export * from './workspace-sdk-keys';
 export * from './workspace-modules';
 export * from './workspace-quotas';
 export * from './workspace-invitations';
+export * from './auditLogs';

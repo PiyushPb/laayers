@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { db, workspaceDomains } from '@layers/database';
+import { db, workspaceDomains, auditLogs } from '@layers/database';
 import { eq, and } from 'drizzle-orm';
 import { sendSuccess, ValidationError, NotFoundError } from '@layers/shared';
 
@@ -52,6 +52,15 @@ export const addDomain = async (req: Request, res: Response) => {
       })
       .returning();
 
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+      action: 'domain.added',
+      entityType: 'domain',
+      entityId: newDomain.id,
+      metadata: { domain: normalized, primary },
+    });
+
     return newDomain;
   });
 
@@ -86,6 +95,15 @@ export const updateDomain = async (req: Request, res: Response) => {
       .where(eq(workspaceDomains.id, domainId))
       .returning();
 
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+      action: 'domain.updated',
+      entityType: 'domain',
+      entityId: domainId,
+      metadata: { primary },
+    });
+
     return updated;
   });
 
@@ -109,6 +127,15 @@ export const deleteDomain = async (req: Request, res: Response) => {
     .delete(workspaceDomains)
     .where(eq(workspaceDomains.id, domainId));
 
+  await db.insert(auditLogs).values({
+    workspaceId: req.workspace.id,
+    userId: req.user.id,
+    action: 'domain.deleted',
+    entityType: 'domain',
+    entityId: domainId,
+    metadata: { domain: domain.domain },
+  });
+
   res.status(200).json(sendSuccess(null, 'Domain deleted successfully'));
 };
 
@@ -130,6 +157,15 @@ export const verifyDomain = async (req: Request, res: Response) => {
     .set({ verified: true })
     .where(eq(workspaceDomains.id, domainId))
     .returning();
+
+  await db.insert(auditLogs).values({
+    workspaceId: req.workspace.id,
+    userId: req.user.id,
+    action: 'domain.verified',
+    entityType: 'domain',
+    entityId: domainId,
+    metadata: { domain: domain.domain },
+  });
 
   res.status(200).json(sendSuccess({ domain: updated }, 'Domain verified successfully'));
 };

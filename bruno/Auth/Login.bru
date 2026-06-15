@@ -16,3 +16,11 @@ body:json {
     "password": "Piyush1234@"
   }
 }
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.data && body.data.sessionToken) {
+    bru.setVar("accessToken", body.data.sessionToken);
+    bru.setEnvVar("accessToken", body.data.sessionToken);
+  }
+}

@@ -1,5 +1,25 @@
 import { z } from 'zod';
 
+export const paginationQuerySchema = z.object({
+  query: z.object({
+    page: z.string().regex(/^\d+$/).optional().default('1').transform(Number),
+    limit: z.string().regex(/^\d+$/).optional().default('10').transform(Number),
+  }),
+});
+
+export const createWorkspaceSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Workspace name is required').max(100),
+  }),
+});
+
+export const updateWorkspaceSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Workspace name is required').max(100).optional(),
+    slug: z.string().min(3, 'Slug must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric and hyphens').optional(),
+  }),
+});
+
 export const inviteMemberSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email address'),

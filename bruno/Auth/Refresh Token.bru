@@ -9,3 +9,11 @@ post {
   body: none
   auth: none
 }
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.data && body.data.sessionToken) {
+    bru.setVar("accessToken", body.data.sessionToken);
+    bru.setEnvVar("accessToken", body.data.sessionToken);
+  }
+}

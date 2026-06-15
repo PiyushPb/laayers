@@ -4,7 +4,7 @@ export const signupSchema = z.object({
   email: z.string().trim().toLowerCase().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   name: z.string().trim().min(1, 'Name is required'),
-  workspaceName: z.string().trim().min(1, 'Workspace name is required'),
+  workspaceName: z.string().trim().min(1, 'Workspace name is required').optional(),
   marketingEmailsEnabled: z.boolean().default(false),
   consents: z.array(z.object({
     consentType: z.enum(['terms', 'privacy', 'cookies', 'marketing']),
