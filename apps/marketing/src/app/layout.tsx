@@ -5,7 +5,6 @@ import Footer from "@/components/layout/Footer";
 import SmoothScrollProvider from "@/components/layout/SmoothScrollProvider";
 import CursorEffect from "@/components/ui/CursorEffect";
 import ScrollProgress from "@/components/ui/ScrollProgress";
-import Loader from "@/components/ui/Loader";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/utils";
 
 export const viewport: Viewport = {
@@ -45,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="lenis">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -56,12 +55,11 @@ export default function RootLayout({
         />
       </head>
       <body className="noise">
-        <Loader />
         <ScrollProgress />
         <CursorEffect />
         <SmoothScrollProvider>
           <Header />
-          <main>{children}</main>
+          <main className="main-wrapper">{children}</main>
           <Footer />
         </SmoothScrollProvider>
       </body>

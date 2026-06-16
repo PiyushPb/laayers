@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef, useEffect, useState } from "react";
+import { motion, useInView, useSpring, Variants } from "framer-motion";
 import { Shield, Lock, Server, Eye, Key, Globe } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const securityItems = [
   {
@@ -47,59 +44,51 @@ const stats = [
   { number: "12", suffix: "k+", label: "Engineering teams" },
 ];
 
-export default function SecuritySection() {
-  const statsRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.07 }
+  }
+};
+
+const itemVariants: any = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, y: 0, 
+    transition: { duration: 0.6, ease: "easeOut" } 
+  }
+};
+
+function AnimatedCounter({ target, isFloat }: { target: number, isFloat: boolean }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const [val, setVal] = useState("0");
+  
+  const springValue = useSpring(0, {
+    bounce: 0,
+    duration: 2000,
+  });
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<Element>(".security-item").forEach((item, i) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            delay: i * 0.07,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: ".security-grid",
-              start: "top 75%",
-            },
-          }
-        );
-      });
+    if (isInView) {
+      springValue.set(target);
+    }
+  }, [isInView, target, springValue]);
 
-      // Stats counter animation
-      gsap.utils.toArray<Element>(".stat-number[data-count]").forEach((el) => {
-        const target = parseFloat((el as HTMLElement).dataset.count ?? "0");
-        const isFloat = target % 1 !== 0;
-        gsap.fromTo(
-          { val: 0 },
-          { val: target,
-            duration: 2,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 80%",
-            },
-            onUpdate: function() {
-              (el as HTMLElement).textContent = isFloat
-                ? this.targets()[0].val.toFixed(2)
-                : Math.round(this.targets()[0].val).toString();
-            }
-          }
-        );
-      });
-    }, sectionRef);
+  useEffect(() => {
+    return springValue.on("change", (latest) => {
+      setVal(isFloat ? latest.toFixed(2) : Math.round(latest).toString());
+    });
+  }, [springValue, isFloat]);
 
-    return () => ctx.revert();
-  }, []);
+  return <span ref={ref} className="stat-number">{val}</span>;
+}
 
+export default function SecuritySection() {
   return (
     <>
-      <section className="section" ref={sectionRef} id="security">
+      <section className="section" id="security">
         <div className="container">
           <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Security & Trust</p>
           <h2 className="text-display-sm" style={{ marginBottom: "1.5rem", maxWidth: "600px" }}>
@@ -110,38 +99,44 @@ export default function SecuritySection() {
             your compliance team requires.
           </p>
 
-          <div className="security-grid">
+          <motion.div 
+            className="security-grid"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
             {securityItems.map(({ Icon, title, description }) => (
-              <div key={title} className="security-item">
+              <motion.div key={title} className="security-item" variants={itemVariants}>
                 <div className="security-icon">
                   <Icon size={18} />
                 </div>
                 <h3 className="security-title">{title}</h3>
                 <p className="security-desc">{description}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Stats */}
       <section style={{ paddingBlock: "4rem", borderBlock: "1px solid var(--border)" }}>
         <div className="container">
-          <div className="stats-grid" ref={statsRef}>
-            {stats.map((stat) => (
-              <div key={stat.label} className="stat-item">
-                <span
-                  className="stat-number"
-                  data-count={stat.number.replace(/[^0-9.]/g, "")}
-                >
-                  {stat.number}
-                </span>
-                <span style={{ fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "-0.04em", color: "var(--fg-muted)" }}>
-                  {stat.suffix}
-                </span>
-                <p className="stat-label" style={{ marginTop: "0.5rem" }}>{stat.label}</p>
-              </div>
-            ))}
+          <div className="stats-grid">
+            {stats.map((stat) => {
+              const numTarget = parseFloat(stat.number.replace(/[^0-9.]/g, "") || "0");
+              const isFloat = stat.number.includes(".");
+              return (
+                <div key={stat.label} className="stat-item">
+                  {stat.number.startsWith("<") && <span className="stat-number">{"< "}</span>}
+                  <AnimatedCounter target={numTarget} isFloat={isFloat} />
+                  <span style={{ fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "-0.04em", color: "var(--fg-muted)" }}>
+                    {stat.suffix}
+                  </span>
+                  <p className="stat-label" style={{ marginTop: "0.5rem" }}>{stat.label}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

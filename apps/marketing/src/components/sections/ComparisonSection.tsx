@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Check, Minus } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const rows = [
   { feature: "Zero-downtime deployments", us: true, comp1: true, comp2: false },
@@ -45,62 +42,32 @@ const testimonials = [
 ];
 
 export default function ComparisonSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const testimonialRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".comparison-table",
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".comparison-table",
-            start: "top 75%",
-          },
-        }
-      );
-    }, sectionRef);
-
-    // Auto-advance testimonials
     const interval = setInterval(() => {
-      const track = trackRef.current;
-      if (!track) return;
-      activeRef.current = (activeRef.current + 1) % testimonials.length;
-      gsap.to(track, {
-        x: `-${activeRef.current * 100}%`,
-        duration: 0.8,
-        ease: "power3.inOut",
-      });
-      // Update dots
-      document.querySelectorAll(".testimonial-dot").forEach((dot, i) => {
-        dot.classList.toggle("active", i === activeRef.current);
-      });
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
-
-    return () => {
-      ctx.revert();
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <>
       {/* Comparison Table */}
-      <section className="section" ref={sectionRef} id="comparison">
+      <section className="section" id="comparison">
         <div className="container">
           <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Comparison</p>
           <h2 className="text-display-sm" style={{ marginBottom: "4rem", maxWidth: "600px" }}>
             How we stack up.
           </h2>
 
-          <div className="comparison-table-wrap">
+          <motion.div 
+            className="comparison-table-wrap"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          >
             <table className="comparison-table">
               <thead>
                 <tr>
@@ -127,7 +94,7 @@ export default function ComparisonSection() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -136,8 +103,12 @@ export default function ComparisonSection() {
         <div className="container">
           <p className="text-eyebrow" style={{ marginBottom: "3rem" }}>Customer Stories</p>
 
-          <div style={{ overflow: "hidden" }} ref={testimonialRef}>
-            <div className="testimonial-track" ref={trackRef}>
+          <div style={{ overflow: "hidden" }}>
+            <motion.div 
+              className="testimonial-track"
+              animate={{ x: `-${activeIndex * 100}%` }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+            >
               {testimonials.map((t) => (
                 <div key={t.name} className="testimonial-card">
                   <div>
@@ -151,26 +122,15 @@ export default function ComparisonSection() {
                   </div>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           <div className="testimonial-controls">
             {testimonials.map((_, i) => (
               <button
                 key={i}
-                className={`testimonial-dot ${i === 0 ? "active" : ""}`}
-                onClick={() => {
-                  if (!trackRef.current) return;
-                  activeRef.current = i;
-                  gsap.to(trackRef.current, {
-                    x: `-${i * 100}%`,
-                    duration: 0.8,
-                    ease: "power3.inOut",
-                  });
-                  document.querySelectorAll(".testimonial-dot").forEach((dot, j) => {
-                    dot.classList.toggle("active", j === i);
-                  });
-                }}
+                className={`testimonial-dot ${i === activeIndex ? "active" : ""}`}
+                onClick={() => setActiveIndex(i)}
                 aria-label={`Testimonial ${i + 1}`}
               />
             ))}

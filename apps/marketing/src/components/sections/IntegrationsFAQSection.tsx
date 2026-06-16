@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useState } from "react";
+import { motion, Variants } from "framer-motion";
 import { Plus } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const integrations = [
   "GitHub", "GitLab", "Bitbucket", "AWS", "GCP", "Azure",
@@ -40,40 +37,31 @@ const faqs = [
   },
 ];
 
+const integrationsContainerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.03 }
+  }
+};
+
+const integrationItemVariants: any = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { 
+    opacity: 1, scale: 1, 
+    transition: { duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] } 
+  }
+};
+
 export default function IntegrationsFAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<Element>(".integration-item").forEach((item, i) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, scale: 0.9 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.4,
-            delay: i * 0.03,
-            ease: "back.out(1.5)",
-            scrollTrigger: {
-              trigger: ".integrations-grid",
-              start: "top 75%",
-            },
-          }
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
 
   const toggle = (i: number) => {
     setOpenIdx(openIdx === i ? null : i);
   };
 
   return (
-    <div ref={sectionRef}>
+    <div>
       {/* Integrations */}
       <section className="section" id="integrations">
         <div className="container">
@@ -85,18 +73,24 @@ export default function IntegrationsFAQSection() {
             Native integrations with 80+ tools. REST API and webhooks for everything else.
           </p>
 
-          <div className="integrations-grid">
+          <motion.div 
+            className="integrations-grid"
+            variants={integrationsContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
             {integrations.map((name) => (
-              <div key={name} className="integration-item">
+              <motion.div key={name} className="integration-item" variants={integrationItemVariants}>
                 <div className="integration-icon">
                   <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--fg-muted)", fontFamily: "var(--font-mono)" }}>
                     {name.slice(0, 2).toUpperCase()}
                   </span>
                 </div>
                 <span className="integration-name">{name}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 

@@ -1,74 +1,52 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, Variants } from "framer-motion";
 
-gsap.registerPlugin(ScrollTrigger);
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 }
+  }
+};
 
-const benefits = [
-  { number: "10×", label: "Faster incident resolution with unified observability and automatic correlation." },
-  { number: "99.97%", label: "Average platform uptime across all customer deployments." },
-  { number: "< 2h", label: "Average onboarding time for new engineers, from zero to first deploy." },
-  { number: "SOC 2", label: "Type II certified. GDPR compliant. HIPAA ready." },
-];
+const itemVariants: any = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, y: 0, 
+    transition: { duration: 0.7, ease: "easeOut" } 
+  }
+};
+
+const numberVariants: any = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { 
+    opacity: 1, scale: 1, 
+    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } 
+  }
+};
 
 export default function BenefitsSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<Element>(".benefit-item").forEach((item, i) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            delay: i * 0.08,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: ".benefits-grid",
-              start: "top 75%",
-            },
-          }
-        );
-      });
-
-      // Animate the large number in the left col-8 item
-      gsap.fromTo(
-        ".benefit-big-number",
-        { opacity: 0, scale: 0.8 },
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: ".benefits-grid",
-            start: "top 70%",
-          },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section className="section" ref={sectionRef} id="benefits">
+    <section className="section" id="benefits">
       <div className="container">
         <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Why Laayers</p>
         <h2 className="text-display-sm" style={{ marginBottom: "4rem", maxWidth: "640px" }}>
           Numbers that tell the real story.
         </h2>
 
-        <div className="benefits-grid">
+        <motion.div 
+          className="benefits-grid"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
           {/* Large span item */}
-          <div className="benefit-item col-8" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
-            <p
+          <motion.div className="benefit-item col-8" variants={itemVariants} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+            <motion.p
               className="benefit-big-number"
+              variants={numberVariants}
               style={{
                 fontSize: "clamp(5rem, 12vw, 10rem)",
                 fontWeight: 800,
@@ -78,25 +56,25 @@ export default function BenefitsSection() {
               }}
             >
               10×
-            </p>
+            </motion.p>
             <p style={{ fontSize: "var(--text-lg)", color: "var(--fg-muted)", maxWidth: "280px", lineHeight: 1.6 }}>
               Faster incident resolution with unified observability and automatic correlation.
             </p>
-          </div>
+          </motion.div>
 
           {/* Small span */}
-          <div className="benefit-item col-4">
+          <motion.div className="benefit-item col-4" variants={itemVariants}>
             <div className="benefit-number">99.97%</div>
             <p className="benefit-label">Platform uptime across all deployments.</p>
-          </div>
+          </motion.div>
 
-          <div className="benefit-item col-4">
+          <motion.div className="benefit-item col-4" variants={itemVariants}>
             <div className="benefit-number">&lt; 2h</div>
             <p className="benefit-label">Onboarding time for new engineers.</p>
-          </div>
+          </motion.div>
 
           {/* Full width */}
-          <div className="benefit-item col-8" style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+          <motion.div className="benefit-item col-8" variants={itemVariants} style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             <p className="text-eyebrow" style={{ marginBottom: "1rem" }}>Compliance</p>
             <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
               {["SOC 2 Type II", "GDPR", "HIPAA Ready", "ISO 27001"].map((badge) => (
@@ -112,8 +90,8 @@ export default function BenefitsSection() {
                 </span>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

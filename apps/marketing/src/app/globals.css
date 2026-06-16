@@ -309,55 +309,6 @@ html.lenis, html.lenis body { height: auto; }
   transition: transform 0.05s linear;
 }
 
-/* ─── Loading Screen ─────────────────────────────────────────────────────── */
-#loader {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  z-index: 99998;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 2rem;
-  transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1),
-              opacity 0.65s ease;
-  will-change: transform;
-}
-#loader.loader-exit {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-#loader .loader-logo {
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--fg);
-}
-#loader .loader-bar-wrap {
-  width: 200px;
-  height: 1px;
-  background: var(--border);
-  position: relative;
-}
-#loader .loader-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0%;
-  background: var(--fg);
-}
-#loader .loader-count {
-  font-size: var(--text-xs);
-  color: var(--fg-subtle);
-  letter-spacing: 0.1em;
-  position: absolute;
-  right: 0;
-  bottom: -1.5rem;
-}
-
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 .header {
   position: fixed;
@@ -1052,7 +1003,7 @@ html.lenis, html.lenis body { height: auto; }
   line-height: 1;
   color: var(--fg);
   margin-bottom: 0.5rem;
-  display: block;
+  display: inline-block;
 }
 .stat-label {
   font-size: var(--text-sm);
@@ -1825,30 +1776,6 @@ html.lenis, html.lenis body { height: auto; }
   .final-cta { min-height: 60vh; }
   .final-cta-headline { font-size: clamp(3rem, 12vw, 6rem); }
 
-  /* Workflow section — vertical layout on mobile */
-  .h-scroll-section { overflow: visible; }
-  .h-scroll-track {
-    flex-direction: column;
-    width: 100%;
-    padding-inline: var(--gutter) !important;
-    padding-bottom: var(--section-py) !important;
-    will-change: auto;
-    transform: none !important;
-  }
-  .h-scroll-card { width: 100%; max-width: 100%; }
-  .connector-line {
-    width: auto;
-    height: 40px;
-    flex-shrink: unset;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .connector-line::after {
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--border-strong), var(--border));
-  }
 }
 
 @media (max-width: 480px) {
@@ -1878,4 +1805,45 @@ html.lenis, html.lenis body { height: auto; }
   /* Comparison */
   .comparison-table th, .comparison-table td { padding: 0.75rem; }
 }
+
+/* ─── Animation Safety Net ────────────────────────────────────────────────── */
+
+/* Users who prefer reduced motion should never see invisible content.
+   Force all Framer Motion-controlled opacity/transform to their visible state. */
+@media (prefers-reduced-motion: reduce) {
+  /* Framer Motion sets these as inline styles when in initial/hidden state */
+  *[style*="opacity: 0"] {
+    opacity: 1 !important;
+  }
+  *[style*="transform:"] {
+    transform: none !important;
+  }
+  /* Disable all transitions and animations for accessibility */
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Fallback: if any Framer Motion element is stuck in its initial hidden state
+   on mobile/touch devices for more than 1.5 seconds, force it visible.
+   This guarantees content is never permanently invisible on mobile even if
+   IntersectionObserver/hydration fails, while allowing successful animations to run. */
+@keyframes _fm-force-visible {
+  to {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
+  /* Targets any elements that Framer Motion sets to opacity:0 or opacity: 0 inline,
+     forcing them to be visible if they remain stuck for more than 1.5 seconds. */
+  *[style*="opacity: 0"],
+  *[style*="opacity:0"] {
+    animation: _fm-force-visible 0.1s 1.5s forwards !important;
+  }
+}
+
 

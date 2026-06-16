@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion, Variants } from "framer-motion";
 
 const problems = [
   {
@@ -27,42 +23,27 @@ const problems = [
   },
 ];
 
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 }
+  }
+};
+
+const itemVariants: any = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { 
+    opacity: 1, y: 0, 
+    transition: { duration: 0.9, ease: "easeOut" } 
+  }
+};
+
 export default function ProblemSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<Element>(".problem-item").forEach((item) => {
-        const number = item.querySelector(".number");
-        const title = item.querySelector(".problem-title");
-        const body = item.querySelector(".problem-body");
-        const detail = item.querySelector(".problem-detail");
-
-        gsap.fromTo(
-          [number, title, body, detail],
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            ease: "power3.out",
-            stagger: 0.12,
-            scrollTrigger: {
-              trigger: item,
-              start: "top 70%",
-            },
-          }
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section className="section problem-section" ref={sectionRef} id="problem">
+    <section className="section problem-section" id="problem">
       <div className="container">
-        <div className="reveal" style={{ marginBottom: "2rem" }}>
+        <div style={{ marginBottom: "2rem" }}>
           <p className="text-eyebrow">The Problem</p>
         </div>
         <h2 className="text-display-sm" style={{ marginBottom: "5rem", maxWidth: "700px" }}>
@@ -70,15 +51,20 @@ export default function ProblemSection() {
         </h2>
 
         {problems.map((p, i) => (
-          <div
+          <motion.div
             key={p.number}
             className={`problem-item ${i % 2 === 1 ? "reverse" : ""}`}
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
           >
-            <div>
+            <motion.div variants={itemVariants}>
               <p className="number">{p.number}</p>
-            </div>
+            </motion.div>
             <div>
-              <h3
+              <motion.h3
+                variants={itemVariants}
                 className="problem-title"
                 style={{
                   fontSize: "var(--text-4xl)",
@@ -89,8 +75,9 @@ export default function ProblemSection() {
                 }}
               >
                 {p.title}
-              </h3>
-              <p
+              </motion.h3>
+              <motion.p
+                variants={itemVariants}
                 className="problem-body"
                 style={{
                   fontSize: "var(--text-lg)",
@@ -101,8 +88,9 @@ export default function ProblemSection() {
                 }}
               >
                 {p.body}
-              </p>
-              <p
+              </motion.p>
+              <motion.p
+                variants={itemVariants}
                 className="problem-detail"
                 style={{
                   fontSize: "var(--text-sm)",
@@ -114,9 +102,9 @@ export default function ProblemSection() {
                 }}
               >
                 {p.detail}
-              </p>
+              </motion.p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>

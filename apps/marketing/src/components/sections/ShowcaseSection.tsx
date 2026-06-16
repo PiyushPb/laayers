@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion, Variants } from "framer-motion";
 
 const codeLines = [
   { type: "comment", text: "# Deploy to production" },
@@ -22,51 +18,33 @@ const codeLines = [
   { type: "string", text: "✓ Full rollout complete" },
 ];
 
+const browserVariants: any = {
+  hidden: { opacity: 0, y: 60, scale: 0.97 },
+  visible: { 
+    opacity: 1, y: 0, scale: 1, 
+    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } 
+  }
+};
+
+const codeContainerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 }
+  }
+};
+
+const codeLineVariants: any = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { 
+    opacity: 1, x: 0, 
+    transition: { duration: 0.4, ease: "easeOut" } 
+  }
+};
+
 export default function ShowcaseSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".showcase-browser",
-        { opacity: 0, y: 60, scale: 0.97 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: ".showcase-browser",
-            start: "top 75%",
-          },
-        }
-      );
-
-      gsap.utils.toArray<Element>(".code-line").forEach((line, i) => {
-        gsap.fromTo(
-          line,
-          { opacity: 0, x: -10 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.4,
-            delay: i * 0.06,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: ".code-snippet",
-              start: "top 70%",
-            },
-          }
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section className="section showcase-section" ref={sectionRef} id="showcase">
+    <section className="section showcase-section" id="showcase">
       <div className="container">
         <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Product</p>
 
@@ -90,7 +68,13 @@ export default function ShowcaseSection() {
           </div>
 
           {/* Browser mockup */}
-          <div className="showcase-browser">
+          <motion.div 
+            className="showcase-browser"
+            variants={browserVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
             <div className="browser-bar">
               <div className="browser-dots">
                 <div className="browser-dot" />
@@ -138,14 +122,20 @@ export default function ShowcaseSection() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Code section */}
         <div className="showcase-grid showcase-grid--bottom">
-          <div className="code-snippet">
+          <motion.div 
+            className="code-snippet"
+            variants={codeContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
             {codeLines.map((line, i) => (
-              <div key={i} className="code-line">
+              <motion.div key={i} className="code-line" variants={codeLineVariants}>
                 {line.type === "comment" && (
                   <span className="comment">{line.text}</span>
                 )}
@@ -159,9 +149,9 @@ export default function ShowcaseSection() {
                 {line.type === "string" && (
                   <span className="string">{line.text}</span>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div>
             <h2 className="text-headline" style={{ marginBottom: "1.5rem" }}>
