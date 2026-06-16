@@ -6,6 +6,7 @@ export const workspaceModules = pgTable('workspace_modules', {
   id: text('id').primaryKey().$defaultFn(() => createId()),
   workspaceId: text('workspace_id').notNull().references(() => workspaces.id, { onDelete: 'cascade' }),
   moduleKey: text('module_key').notNull(),
+  plan: text('plan').default('free').notNull(),
   enabled: boolean('enabled').default(false).notNull(),
   config: jsonb('config').default({}),
 });

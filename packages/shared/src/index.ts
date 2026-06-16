@@ -3,3 +3,4 @@ export * from './response/ApiResponse';
 export * from './utils/crypto';
 export * from './utils/cookie';
 export * from './config/clusters';
+export * from './config/plans';

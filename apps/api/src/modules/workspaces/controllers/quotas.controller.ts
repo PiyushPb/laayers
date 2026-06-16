@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { db, workspaceQuotas, workspaceMembers, workspaceModules } from '@layers/database';
 import { eq, sql, and } from 'drizzle-orm';
-import { sendSuccess, CLUSTERS_CONFIG, CORE_QUOTAS, ClusterId, ValidationError } from '@layers/shared';
+import { sendSuccess, CLUSTERS_CONFIG, CORE_QUOTAS, ClusterId, ValidationError, PLANS_CONFIG } from '@layers/shared';
 
 export const getQuotas = async (req: Request, res: Response) => {
   let [quotas] = await db
@@ -10,14 +10,8 @@ export const getQuotas = async (req: Request, res: Response) => {
     .where(eq(workspaceQuotas.workspaceId, req.workspace.id))
     .limit(1);
 
-  if (!quotas) {
-    [quotas] = await db
-      .insert(workspaceQuotas)
-      .values({
-        workspaceId: req.workspace.id,
-      })
-      .returning();
-  }
+  const corePlanId = req.workspace.plan || 'free';
+  const corePlanDefaults = PLANS_CONFIG.core[corePlanId]?.limits || PLANS_CONFIG.core.free.limits;
 
   // Calculate actual member count consumption
   const [memberCountResult] = await db
@@ -31,7 +25,7 @@ export const getQuotas = async (req: Request, res: Response) => {
 
   // Fetch enabled modules for the workspace
   const enabledModules = await db
-    .select({ moduleKey: workspaceModules.moduleKey })
+    .select({ moduleKey: workspaceModules.moduleKey, plan: workspaceModules.plan })
     .from(workspaceModules)
     .where(and(
       eq(workspaceModules.workspaceId, req.workspace.id),
@@ -54,11 +48,11 @@ export const getQuotas = async (req: Request, res: Response) => {
   // Add core quotas if no specific cluster is requested, or if 'core' is explicitly requested
   if (!requestedCluster || requestedCluster === 'core') {
     if (coreQuotas.includes('members')) {
-      limits.maxMembers = quotas.maxMembers;
+      limits.maxMembers = quotas?.maxMembers ?? corePlanDefaults.maxMembers;
       consumption.members = activeMembers;
     }
     if (coreQuotas.includes('storageMb')) {
-      limits.maxStorageMb = quotas.maxStorageMb;
+      limits.maxStorageMb = quotas?.maxStorageMb ?? corePlanDefaults.maxStorageMb;
       consumption.storageMb = 0; // Placeholder until file upload is built
     }
   }
@@ -76,13 +70,25 @@ export const getQuotas = async (req: Request, res: Response) => {
     
     if (config) {
       const clusterQuotas = config.quotas as readonly string[];
-      if (clusterQuotas.includes('blogs')) {
-        limits.maxBlogs = quotas.maxBlogs;
-        consumption.blogs = 0; // Placeholder until blogs module is built
+      
+      if (clusterId === 'blogs') {
+        const blogsPlan = module.plan || 'free';
+        const blogsDefaults = PLANS_CONFIG.blogs[blogsPlan]?.limits || PLANS_CONFIG.blogs.free.limits;
+        
+        if (clusterQuotas.includes('blogs')) {
+          limits.maxBlogs = quotas?.maxBlogs ?? blogsDefaults.maxBlogs;
+          consumption.blogs = 0; 
+        }
       }
-      if (clusterQuotas.includes('chats')) {
-        limits.maxChats = quotas.maxChats;
-        consumption.chats = 0; // Placeholder until chat logs are active
+
+      if (clusterId === 'chat') {
+        const chatPlan = module.plan || 'free';
+        const chatDefaults = PLANS_CONFIG.chat[chatPlan]?.limits || PLANS_CONFIG.chat.free.limits;
+
+        if (clusterQuotas.includes('chats')) {
+          limits.maxChats = quotas?.maxChats ?? chatDefaults.maxChats;
+          consumption.chats = 0; 
+        }
       }
     }
   }
@@ -92,3 +98,4 @@ export const getQuotas = async (req: Request, res: Response) => {
     consumption,
   }));
 };
+
