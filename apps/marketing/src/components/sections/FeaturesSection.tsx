@@ -67,8 +67,7 @@ function FeaturePanel({ f, index, setActiveFeature }: { f: any, index: number, s
       <motion.div
         className="feature-panel-content"
         initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.1 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <p className="text-eyebrow feature-label">{f.label}</p>

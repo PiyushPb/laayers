@@ -1,7 +1,6 @@
 @import "tailwindcss";
+@source "../components";
 @import "tw-animate-css";
-
-
 
 /* ─── Design Tokens ─────────────────────────────────────────────────────── */
 @theme {
@@ -309,113 +308,6 @@ html.lenis, html.lenis body { height: auto; }
   transition: transform 0.05s linear;
 }
 
-/* ─── Header ─────────────────────────────────────────────────────────────── */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  padding-block: 1.25rem;
-  transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
-  border-bottom: 1px solid transparent;
-}
-.header.scrolled {
-  background: rgba(10, 10, 10, 0.8);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom-color: var(--border);
-}
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-}
-.header-logo {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--fg);
-  text-decoration: none;
-  flex-shrink: 0;
-  transition: opacity 0.2s;
-}
-.header-logo:hover { opacity: 0.7; }
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-.header-nav a {
-  font-size: var(--text-sm);
-  color: var(--fg-muted);
-  text-decoration: none;
-  letter-spacing: 0.01em;
-  transition: color 0.2s;
-  position: relative;
-}
-.header-nav a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--fg);
-  transition: width 0.3s var(--ease-out-expo);
-}
-.header-nav a:hover { color: var(--fg); }
-.header-nav a:hover::after { width: 100%; }
-.header-actions { display: flex; align-items: center; gap: 0.75rem; }
-.header-mobile-toggle {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--fg);
-}
-
-/* ─── Mobile Nav ─────────────────────────────────────────────────────────── */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  z-index: 999;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.mobile-nav.open {
-  opacity: 1;
-  pointer-events: all;
-  display: flex;
-}
-.mobile-nav a {
-  font-size: var(--text-4xl);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--fg);
-  text-decoration: none;
-  opacity: 0.4;
-  transition: opacity 0.2s;
-}
-.mobile-nav a:hover { opacity: 1; }
-.mobile-nav-close {
-  position: absolute;
-  top: 1.5rem;
-  right: 2rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--fg);
-  font-size: 1.5rem;
-}
 
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
 .hero {
@@ -1734,9 +1626,6 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 768px) {
   :root { --section-py: clamp(3.5rem, 8vw, 5rem); }
 
-  /* Header */
-  .header-nav { display: none; }
-  .header-mobile-toggle { display: flex; }
 
   /* Hero */
   .hero { padding-top: 6rem; padding-bottom: 4rem; min-height: 100svh; }
@@ -1781,8 +1670,6 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 480px) {
   .hero-headline { font-size: clamp(2.2rem, 10vw, 3rem); }
 
-  /* Header: hide sign in to prevent overflow */
-  .header-actions .btn-ghost { display: none; }
 
   /* Category filter */
   .category-nav { flex-direction: column; }
@@ -1827,8 +1714,8 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 /* Fallback: if any Framer Motion element is stuck in its initial hidden state
-   on mobile/touch devices for more than 1.5 seconds, force it visible.
-   This guarantees content is never permanently invisible on mobile even if
+   on ANY device for more than 1.5 seconds, force it visible.
+   This guarantees content is never permanently invisible even if
    IntersectionObserver/hydration fails, while allowing successful animations to run. */
 @keyframes _fm-force-visible {
   to {
@@ -1837,13 +1724,9 @@ html.lenis, html.lenis body { height: auto; }
   }
 }
 
-@media (hover: none) and (pointer: coarse), (max-width: 1024px) {
-  /* Targets any elements that Framer Motion sets to opacity:0 or opacity: 0 inline,
-     forcing them to be visible if they remain stuck for more than 1.5 seconds. */
-  *[style*="opacity: 0"],
-  *[style*="opacity:0"] {
-    animation: _fm-force-visible 0.1s 1.5s forwards !important;
-  }
+/* Targets any elements that Framer Motion sets to opacity:0 or opacity: 0 inline,
+   forcing them to be visible if they remain stuck for more than 1.5 seconds. */
+*[style*="opacity: 0"],
+*[style*="opacity:0"] {
+  animation: _fm-force-visible 0.1s 1.5s forwards !important;
 }
-
-

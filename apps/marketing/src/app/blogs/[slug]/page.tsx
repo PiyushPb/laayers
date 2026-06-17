@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -13,7 +13,8 @@ const tocItems = [
   { id: "conclusion", label: "Conclusion" },
 ];
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
+export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
