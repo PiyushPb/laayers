@@ -54,12 +54,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="noise">
+      <body className="noise bg-bg text-fg font-sans antialiased">
         <ScrollProgress />
         <CursorEffect />
         <SmoothScrollProvider>
           <Header />
-          <main className="main-wrapper">{children}</main>
+          <main className="flex flex-col flex-1 overflow-hidden">{children}</main>
           <Footer />
         </SmoothScrollProvider>
       </body>

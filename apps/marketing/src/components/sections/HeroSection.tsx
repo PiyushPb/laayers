@@ -46,20 +46,20 @@ const fadeVariants: Variants = {
 
 export default function HeroSection() {
   return (
-    <section className="hero noise">
-      <div className="hero-bg" />
+    <section className="noise min-h-screen max-md:min-h-[100svh] flex items-center relative overflow-hidden pt-32 pb-24 max-md:pt-24 max-md:pb-16">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(255,255,255,0.04)_0%,transparent_60%)]" />
       <div className="grid-overlay" />
 
       <div className="container">
         <motion.div
-          className="hero-content"
+          className="relative z-10 w-full text-left"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <h1 className="hero-headline">
+          <h1 className="text-9xl max-md:text-[clamp(2.8rem,11vw,5rem)] max-sm:text-[clamp(2.2rem,10vw,3rem)] font-extrabold leading-[0.92] tracking-[-0.04em] mb-8">
             <div className="overflow-hidden">
-              <motion.div variants={textVariants}>
+              <motion.div variants={textVariants} className="block">
                 Infrastructure
               </motion.div>
             </div>
@@ -67,23 +67,21 @@ export default function HeroSection() {
             <div className="overflow-hidden">
               <motion.div
                 variants={textVariants}
-                style={{
-                  color: "var(--fg-muted)",
-                }}
+                className="block text-fg-muted"
               >
                 for teams
               </motion.div>
             </div>
 
             <div className="overflow-hidden">
-              <motion.div variants={textVariants}>
+              <motion.div variants={textVariants} className="block">
                 that ship.
               </motion.div>
             </div>
           </h1>
 
           <motion.p
-            className="hero-subline"
+            className="text-xl text-fg-muted max-w-[520px] leading-[1.6] mb-12"
             variants={fadeVariants}
           >
             Laayers gives engineering teams a unified control
@@ -92,17 +90,17 @@ export default function HeroSection() {
           </motion.p>
 
           <motion.div
-            className="hero-cta-row"
+            className="flex items-center gap-4 flex-wrap"
             variants={fadeVariants}
           >
-            <Link href="#" className="btn btn-primary">
+            <Link href="#" className="inline-flex items-center gap-2 px-6 py-3 font-sans text-sm font-medium tracking-[0.01em] border-none cursor-pointer no-underline transition-all duration-300 ease-out-expo relative overflow-hidden bg-fg text-bg rounded-md hover:bg-fg-muted hover:-translate-y-[1px]">
               Start for free
               <ArrowRight size={16} />
             </Link>
 
             <Link
               href="/#showcase"
-              className="btn btn-secondary"
+              className="inline-flex items-center gap-2 px-6 py-3 font-sans text-sm font-medium tracking-[0.01em] cursor-pointer no-underline transition-all duration-300 ease-out-expo relative overflow-hidden bg-transparent text-fg border border-border-strong rounded-md hover:bg-bg-secondary hover:border-border-strong hover:-translate-y-[1px]"
             >
               View product
             </Link>
@@ -111,7 +109,7 @@ export default function HeroSection() {
       </div>
 
       <motion.div
-        className="hero-scroll-indicator"
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-fg-subtle text-xs tracking-[0.12em] uppercase max-md:hidden animate-[scrollBounce_2s_ease-in-out_infinite]"
         initial={{
           opacity: 0,
         }}
@@ -123,16 +121,9 @@ export default function HeroSection() {
           duration: 0.8,
         }}
       >
-        <div className="hero-scroll-line" />
+        <div className="w-px h-[60px] bg-[linear-gradient(to_bottom,var(--color-fg-subtle),transparent)]" />
 
-        <span
-          style={{
-            fontSize: "var(--text-xs)",
-            color: "var(--fg-subtle)",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-          }}
-        >
+        <span>
           Scroll
         </span>
       </motion.div>

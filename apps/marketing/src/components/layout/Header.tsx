@@ -49,7 +49,7 @@ export default function Header() {
         <div
           className={`mx-auto transition-all duration-500 ${
             isScrolled
-              ? "mx-4 mt-4 max-w-6xl rounded-2xl bg-zinc-950/80 px-6 py-3 shadow-lg shadow-black/50 backdrop-blur-2xl lg:mx-auto"
+              ? "mx-4 mt-4 max-w-6xl rounded-2xl bg-bg/80 border border-border px-6 py-3 shadow-lg backdrop-blur-2xl lg:mx-auto"
               : "max-w-7xl px-6 py-5 lg:px-10"
           }`}
         >
@@ -63,13 +63,13 @@ export default function Header() {
               className="flex items-center gap-2.5"
               aria-label="Laayers home"
             >
-              <figure className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
+              <figure className="flex h-8 w-8 items-center justify-center rounded-lg bg-fg">
                 <svg
                   width="16"
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="black"
+                  stroke="var(--bg)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -80,7 +80,7 @@ export default function Header() {
                   <polyline points="2 12 12 17 22 12" />
                 </svg>
               </figure>
-              <span className="text-lg font-medium tracking-tight text-white">Laayers</span>
+              <span className="text-lg font-medium tracking-tight text-fg">Laayers</span>
             </Link>
 
             <ul className="hidden items-center gap-1 lg:flex" role="list">
@@ -88,7 +88,7 @@ export default function Header() {
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className="rounded-lg px-3.5 py-2 text-sm text-zinc-400 transition-colors duration-200 hover:bg-zinc-900/60 hover:text-white"
+                    className="rounded-lg px-3.5 py-2 text-sm text-fg-muted transition-colors duration-200 hover:bg-bg-secondary hover:text-fg"
                   >
                     {item.label}
                   </Link>
@@ -99,12 +99,12 @@ export default function Header() {
             <div className="hidden items-center gap-3 lg:flex">
               <Link
                 href="#"
-                className="rounded-lg px-4 py-2 text-sm text-zinc-400 transition-colors duration-200 hover:text-white"
+                className="rounded-lg px-4 py-2 text-sm text-fg-muted transition-colors duration-200 hover:text-fg"
               >
                 Sign in
               </Link>
               <MagneticButton
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition-colors duration-200 hover:bg-zinc-200"
+                className="rounded-full bg-fg px-5 py-2.5 text-sm font-medium text-bg transition-colors duration-200 hover:bg-fg/90"
                 ariaLabel="Get started"
               >
                 Get started
@@ -112,21 +112,21 @@ export default function Header() {
             </div>
 
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-zinc-900 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-bg-secondary lg:hidden"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
             >
               <div className="flex w-5 flex-col gap-1.5">
                 <motion.span
-                  className="block h-px w-full bg-white"
+                  className="block h-px w-full bg-fg"
                   animate={
                     isMobileMenuOpen ? { rotate: 45, y: 3.5 } : { rotate: 0, y: 0 }
                   }
                   transition={{ duration: 0.3 }}
                 />
                 <motion.span
-                  className="block h-px w-full bg-white"
+                  className="block h-px w-full bg-fg"
                   animate={
                     isMobileMenuOpen
                       ? { rotate: -45, y: -3.5 }
@@ -143,7 +143,7 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-40 bg-zinc-950 lg:hidden"
+            className="fixed inset-0 z-40 bg-bg lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -165,7 +165,7 @@ export default function Header() {
                   >
                     <Link
                       href={item.href}
-                      className="block py-3 text-3xl font-medium tracking-tight text-white"
+                      className="block py-3 text-3xl font-medium tracking-tight text-fg"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.label}
@@ -183,14 +183,14 @@ export default function Header() {
               >
                 <Link
                   href="#"
-                  className="w-full rounded-xl border border-zinc-800 py-3.5 text-center text-base font-medium text-white"
+                  className="w-full rounded-xl border border-border py-3.5 text-center text-base font-medium text-fg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Sign in
                 </Link>
                 <Link
                   href="#"
-                  className="w-full rounded-xl bg-white py-3.5 text-center text-base font-medium text-black"
+                  className="w-full rounded-xl bg-fg py-3.5 text-center text-base font-medium text-bg"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Get started

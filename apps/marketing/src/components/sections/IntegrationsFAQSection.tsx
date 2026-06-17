@@ -63,31 +63,31 @@ export default function IntegrationsFAQSection() {
   return (
     <div>
       {/* Integrations */}
-      <section className="section" id="integrations">
+      <section className="py-[var(--spacing-section-py)]" id="integrations">
         <div className="container">
-          <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Integrations</p>
-          <h2 className="text-display-sm" style={{ marginBottom: "1rem", maxWidth: "500px" }}>
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3 mb-8">Integrations</p>
+          <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-4 max-w-[500px]">
             Works with your stack.
           </h2>
-          <p className="text-subheading" style={{ marginBottom: "4rem" }}>
+          <p className="text-2xl text-fg-muted mb-16 max-w-[560px] leading-[1.4]">
             Native integrations with 80+ tools. REST API and webhooks for everything else.
           </p>
 
           <motion.div 
-            className="integrations-grid"
+            className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4 max-md:grid-cols-2"
             variants={integrationsContainerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
             {integrations.map((name) => (
-              <motion.div key={name} className="integration-item" variants={integrationItemVariants}>
-                <div className="integration-icon">
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--fg-muted)", fontFamily: "var(--font-mono)" }}>
-                    {name.slice(0, 2).toUpperCase()}
+              <motion.div key={name} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary transition-colors duration-200 hover:bg-border" variants={integrationItemVariants}>
+                <div className="w-8 h-8 rounded flex items-center justify-center bg-bg border border-border">
+                  <span className="text-xs font-bold text-fg-muted font-mono uppercase">
+                    {name.slice(0, 2)}
                   </span>
                 </div>
-                <span className="integration-name">{name}</span>
+                <span className="text-sm font-medium text-fg">{name}</span>
               </motion.div>
             ))}
           </motion.div>
@@ -95,17 +95,17 @@ export default function IntegrationsFAQSection() {
       </section>
 
       {/* FAQ */}
-      <section className="section" id="faq" style={{ borderTop: "1px solid var(--border)" }}>
+      <section className="py-[var(--spacing-section-py)] border-t border-border" id="faq">
         <div className="container">
-          <div className="faq-grid">
+          <div className="grid grid-cols-[1fr_2fr] gap-16 items-start max-lg:grid-cols-1">
             <div>
-              <p className="text-eyebrow" style={{ marginBottom: "1.5rem" }}>FAQ</p>
-              <h2 className="text-display-sm" style={{ marginBottom: "1.5rem" }}>
+              <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3 mb-6">FAQ</p>
+              <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-6">
                 Common questions.
               </h2>
-              <p style={{ fontSize: "var(--text-sm)", color: "var(--fg-muted)", lineHeight: 1.7 }}>
+              <p className="text-sm text-fg-muted leading-[1.7]">
                 Anything else? Email us at{" "}
-                <a href="mailto:hello@laayers.com" style={{ color: "var(--fg)", textDecoration: "underline" }}>
+                <a href="mailto:hello@laayers.com" className="text-fg underline">
                   hello@laayers.com
                 </a>
               </p>
@@ -113,24 +113,26 @@ export default function IntegrationsFAQSection() {
 
             <div>
               {faqs.map((faq, i) => (
-                <div key={i} className={`faq-item ${openIdx === i ? "open" : ""}`}>
+                <div key={i} className="border-b border-border group">
                   <button
-                    className="faq-trigger"
+                    className="w-full flex items-center justify-between py-6 bg-transparent border-none text-left cursor-pointer"
                     onClick={() => toggle(i)}
                     aria-expanded={openIdx === i}
                     aria-controls={`faq-answer-${i}`}
                   >
-                    <span className="faq-question">{faq.question}</span>
-                    <span className="faq-icon" aria-hidden="true">
+                    <span className="text-lg font-medium text-fg transition-colors duration-200 group-hover:text-fg-subtle">{faq.question}</span>
+                    <span className={`w-6 h-6 flex items-center justify-center rounded-full border border-border text-fg transition-transform duration-300 ${openIdx === i ? "rotate-45 bg-fg text-bg border-fg" : ""}`} aria-hidden="true">
                       <Plus size={12} />
                     </span>
                   </button>
                   <div
                     id={`faq-answer-${i}`}
-                    className="faq-answer"
+                    className={`grid transition-all duration-300 ${openIdx === i ? "grid-rows-[1fr] opacity-100 pb-6" : "grid-rows-[0fr] opacity-0"}`}
                     role="region"
                   >
-                    {faq.answer}
+                    <div className="overflow-hidden text-base text-fg-muted leading-[1.6]">
+                      {faq.answer}
+                    </div>
                   </div>
                 </div>
               ))}

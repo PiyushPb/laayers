@@ -54,41 +54,41 @@ export default function ComparisonSection() {
   return (
     <>
       {/* Comparison Table */}
-      <section className="section" id="comparison">
+      <section className="py-[var(--spacing-section-py)]" id="comparison">
         <div className="container">
-          <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Comparison</p>
-          <h2 className="text-display-sm" style={{ marginBottom: "4rem", maxWidth: "600px" }}>
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3 mb-8">Comparison</p>
+          <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-16 max-w-[600px]">
             How we stack up.
           </h2>
 
           <motion.div 
-            className="comparison-table-wrap"
+            className="border border-border rounded-xl overflow-hidden bg-bg"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
           >
-            <table className="comparison-table">
+            <table className="w-full border-collapse text-left">
               <thead>
                 <tr>
-                  <th style={{ width: "45%" }}>Feature</th>
-                  <th className="highlight">Laayers</th>
-                  <th className="comparison-hide-mobile">Competitor A</th>
-                  <th className="comparison-hide-mobile">Competitor B</th>
+                  <th className="font-semibold text-fg px-6 py-5 border-b border-border bg-bg-secondary text-sm" style={{ width: "45%" }}>Feature</th>
+                  <th className="font-semibold text-fg px-6 py-5 border-b border-border bg-bg-tertiary text-sm">Laayers</th>
+                  <th className="font-semibold text-fg px-6 py-5 border-b border-border bg-bg-secondary text-sm max-lg:hidden">Competitor A</th>
+                  <th className="font-semibold text-fg px-6 py-5 border-b border-border bg-bg-secondary text-sm max-lg:hidden">Competitor B</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {rows.map((row, idx) => (
                   <tr key={row.feature}>
-                    <td className="feature-name">{row.feature}</td>
-                    <td className="highlight" style={{ textAlign: "center" }}>
-                      {row.us ? <Check size={16} className="check-icon" style={{ margin: "0 auto" }} /> : <Minus size={16} className="cross-icon" style={{ margin: "0 auto" }} />}
+                    <td className={`px-6 py-4 border-b border-border text-sm font-medium text-fg ${idx === rows.length - 1 ? 'border-b-0' : ''}`}>{row.feature}</td>
+                    <td className={`px-6 py-4 border-b border-border text-sm bg-bg-tertiary text-center ${idx === rows.length - 1 ? 'border-b-0' : ''}`}>
+                      {row.us ? <Check size={16} className="text-fg mx-auto" /> : <Minus size={16} className="text-fg-subtle opacity-50 mx-auto" />}
                     </td>
-                    <td style={{ textAlign: "center" }} className="comparison-hide-mobile">
-                      {row.comp1 ? <Check size={16} className="check-icon" style={{ margin: "0 auto" }} /> : <Minus size={16} className="cross-icon" style={{ margin: "0 auto" }} />}
+                    <td className={`px-6 py-4 border-b border-border text-sm text-center max-lg:hidden ${idx === rows.length - 1 ? 'border-b-0' : ''}`}>
+                      {row.comp1 ? <Check size={16} className="text-fg mx-auto" /> : <Minus size={16} className="text-fg-subtle opacity-50 mx-auto" />}
                     </td>
-                    <td style={{ textAlign: "center" }} className="comparison-hide-mobile">
-                      {row.comp2 ? <Check size={16} className="check-icon" style={{ margin: "0 auto" }} /> : <Minus size={16} className="cross-icon" style={{ margin: "0 auto" }} />}
+                    <td className={`px-6 py-4 border-b border-border text-sm text-center max-lg:hidden ${idx === rows.length - 1 ? 'border-b-0' : ''}`}>
+                      {row.comp2 ? <Check size={16} className="text-fg mx-auto" /> : <Minus size={16} className="text-fg-subtle opacity-50 mx-auto" />}
                     </td>
                   </tr>
                 ))}
@@ -99,37 +99,37 @@ export default function ComparisonSection() {
       </section>
 
       {/* Testimonials */}
-      <section className="section testimonial-section" id="testimonials">
+      <section className="py-[var(--spacing-section-py)] bg-bg-secondary border-t border-border" id="testimonials">
         <div className="container">
-          <p className="text-eyebrow" style={{ marginBottom: "3rem" }}>Customer Stories</p>
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3 mb-12">Customer Stories</p>
 
-          <div style={{ overflow: "hidden" }}>
+          <div className="overflow-hidden">
             <motion.div 
-              className="testimonial-track"
+              className="flex w-full"
               animate={{ x: `-${activeIndex * 100}%` }}
               transition={{ duration: 0.8, ease: "easeInOut" }}
             >
               {testimonials.map((t) => (
-                <div key={t.name} className="testimonial-card">
+                <div key={t.name} className="min-w-full flex-shrink-0 flex flex-col justify-between p-12 max-lg:p-6 bg-bg border border-border rounded-2xl">
                   <div>
-                    <p className="testimonial-quote">{t.quote}</p>
+                    <p className="text-3xl font-medium leading-[1.35] tracking-[-0.02em] text-fg mb-12 max-lg:text-2xl">{t.quote}</p>
                   </div>
-                  <div className="testimonial-author">
-                    <div className="testimonial-avatar" />
-                    <span className="testimonial-name">{t.name}</span>
-                    <span className="testimonial-role">{t.role}</span>
-                    <span className="testimonial-company">{t.company}</span>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="w-12 h-12 rounded-full bg-border" />
+                    <span className="font-semibold text-fg">{t.name}</span>
+                    <span className="text-fg-muted">{t.role}</span>
+                    <span className="text-fg-subtle">{t.company}</span>
                   </div>
                 </div>
               ))}
             </motion.div>
           </div>
 
-          <div className="testimonial-controls">
+          <div className="flex gap-2 mt-8 justify-center">
             {testimonials.map((_, i) => (
               <button
                 key={i}
-                className={`testimonial-dot ${i === activeIndex ? "active" : ""}`}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === activeIndex ? "bg-fg w-6" : "bg-border-strong w-2 hover:bg-fg"}`}
                 onClick={() => setActiveIndex(i)}
                 aria-label={`Testimonial ${i + 1}`}
               />

@@ -82,37 +82,37 @@ function AnimatedCounter({ target, isFloat }: { target: number, isFloat: boolean
     });
   }, [springValue, isFloat]);
 
-  return <span ref={ref} className="stat-number">{val}</span>;
+  return <span ref={ref} className="text-5xl font-bold tracking-[-0.04em] leading-none text-fg">{val}</span>;
 }
 
 export default function SecuritySection() {
   return (
     <>
-      <section className="section" id="security">
+      <section className="py-[var(--spacing-section-py)]" id="security">
         <div className="container">
-          <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Security & Trust</p>
-          <h2 className="text-display-sm" style={{ marginBottom: "1.5rem", maxWidth: "600px" }}>
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3 mb-8">Security & Trust</p>
+          <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-6 max-w-[600px]">
             Enterprise-grade, by default.
           </h2>
-          <p className="text-subheading" style={{ marginBottom: "4rem", maxWidth: "560px" }}>
+          <p className="text-2xl text-fg-muted mb-16 max-w-[560px] leading-[1.4]">
             Security is not a feature tier. Every plan includes the controls
             your compliance team requires.
           </p>
 
           <motion.div 
-            className="security-grid"
+            className="grid grid-cols-3 gap-x-10 gap-y-16 max-lg:grid-cols-2 max-md:grid-cols-1"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
             {securityItems.map(({ Icon, title, description }) => (
-              <motion.div key={title} className="security-item" variants={itemVariants}>
-                <div className="security-icon">
+              <motion.div key={title} className="flex flex-col" variants={itemVariants}>
+                <div className="w-12 h-12 flex items-center justify-center rounded-[0.875rem] border border-border bg-bg-secondary text-fg mb-6">
                   <Icon size={18} />
                 </div>
-                <h3 className="security-title">{title}</h3>
-                <p className="security-desc">{description}</p>
+                <h3 className="text-xl font-semibold tracking-[-0.01em] text-fg mb-3">{title}</h3>
+                <p className="text-base text-fg-muted leading-[1.6]">{description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -120,20 +120,22 @@ export default function SecuritySection() {
       </section>
 
       {/* Stats */}
-      <section style={{ paddingBlock: "4rem", borderBlock: "1px solid var(--border)" }}>
+      <section className="py-16 border-y border-border">
         <div className="container">
-          <div className="stats-grid">
+          <div className="grid grid-cols-4 border-l border-border max-lg:grid-cols-2 max-md:grid-cols-1 max-lg:border-l-0 max-lg:border-t">
             {stats.map((stat) => {
               const numTarget = parseFloat(stat.number.replace(/[^0-9.]/g, "") || "0");
               const isFloat = stat.number.includes(".");
               return (
-                <div key={stat.label} className="stat-item">
-                  {stat.number.startsWith("<") && <span className="stat-number">{"< "}</span>}
-                  <AnimatedCounter target={numTarget} isFloat={isFloat} />
-                  <span style={{ fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "-0.04em", color: "var(--fg-muted)" }}>
-                    {stat.suffix}
-                  </span>
-                  <p className="stat-label" style={{ marginTop: "0.5rem" }}>{stat.label}</p>
+                <div key={stat.label} className="border-r border-border px-8 py-4 flex flex-col justify-center min-h-[140px] max-lg:border-b max-md:border-r-0 max-lg:[&:nth-child(even)]:border-r-0">
+                  <div className="flex items-baseline">
+                    {stat.number.startsWith("<") && <span className="text-5xl font-bold tracking-[-0.04em] leading-none text-fg mr-2">{"< "}</span>}
+                    <AnimatedCounter target={numTarget} isFloat={isFloat} />
+                    <span className="text-3xl font-extrabold tracking-[-0.04em] text-fg-muted ml-1">
+                      {stat.suffix}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-fg-muted uppercase tracking-[0.05em] mt-2">{stat.label}</p>
                 </div>
               );
             })}

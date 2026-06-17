@@ -33,10 +33,10 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   return (
     <>
-      <div className="reading-progress" ref={progressRef} />
+      <div className="fixed top-0 left-0 h-1 bg-fg z-[100] origin-left w-0" ref={progressRef} />
 
       {/* Article hero */}
-      <section className="blog-post-hero">
+      <section className="pt-40 pb-12 max-md:pt-32 bg-bg border-b border-border">
         <div className="container">
           <Link
             href="/blogs"
@@ -58,9 +58,9 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
           </Link>
 
           <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", alignItems: "center" }}>
-            <span className="blog-category-tag">Engineering</span>
-            <span className="blog-read-time">8 min read</span>
-            <span className="blog-read-time">Jun 12, 2026</span>
+            <span className="px-2 py-1 rounded border border-border-strong text-fg font-medium tracking-[0.05em] uppercase text-xs">Engineering</span>
+            <span className="text-fg-subtle text-sm font-mono">8 min read</span>
+            <span className="text-fg-subtle text-sm font-mono">Jun 12, 2026</span>
           </div>
 
           <h1
@@ -76,58 +76,58 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
             Zero-downtime deployments at scale: what we learned shipping 10,000 times a day
           </h1>
 
-          <div className="blog-author">
-            <div className="blog-author-avatar" />
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-border" />
             <div>
-              <div className="blog-author-name">Marcus Webb</div>
-              <div className="blog-author-date">VP Engineering, Laayers</div>
+              <div className="font-semibold text-fg">Marcus Webb</div>
+              <div className="text-sm text-fg-muted">VP Engineering, Laayers</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Article body */}
-      <div className="container blog-post-layout" id="article-body">
+      <div className="container grid grid-cols-[240px_1fr] gap-20 py-[var(--spacing-section-py)] items-start max-lg:grid-cols-1" id="article-body">
         {/* Table of Contents */}
-        <aside className="blog-toc">
-          <h4>Contents</h4>
-          <ol>
+        <aside className="sticky top-32 max-lg:hidden">
+          <h4 className="text-xs font-bold tracking-[0.05em] uppercase text-fg mb-4">Contents</h4>
+          <ol className="flex flex-col gap-3 list-none p-0 m-0">
             {tocItems.map((item) => (
               <li key={item.id}>
-                <a href={`#${item.id}`}>{item.label}</a>
+                <a href={`#${item.id}`} className="text-sm text-fg-muted transition-colors duration-200 hover:text-fg no-underline">{item.label}</a>
               </li>
             ))}
           </ol>
         </aside>
 
         {/* Article content */}
-        <article className="blog-content">
-          <h2 id="intro">Introduction</h2>
-          <p>
+        <article className="max-w-[720px] max-lg:max-w-none">
+          <h2 id="intro" className="text-3xl font-bold tracking-[-0.02em] text-fg mt-12 mb-6">Introduction</h2>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             When we crossed the threshold of 10,000 deployments per day across our customer base,
             we realized our mental model of what &quot;zero-downtime&quot; meant was fundamentally incomplete.
             The naive definition — no HTTP 5xx errors during a deploy — was easy to achieve.
             The real definition — no observable degradation in latency, error rate, or throughput
             for any user, during any phase of a deployment — was a different problem entirely.
           </p>
-          <p>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             This post documents the failure modes we discovered after crossing that threshold,
             the architectural changes we made, and the monitoring infrastructure we built
             to give us confidence that what we ship is what we intended.
           </p>
 
-          <div className="blog-pull-quote">
+          <div className="text-2xl font-medium leading-[1.4] text-fg border-l-4 border-fg pl-6 my-10 italic">
             The naive definition of zero-downtime is easy. The real definition requires you to think
             about every failure mode your infrastructure team has never had to encounter before.
           </div>
 
-          <h2 id="architecture">The architecture problem</h2>
-          <p>
+          <h2 id="architecture" className="text-3xl font-bold tracking-[-0.02em] text-fg mt-12 mb-6">The architecture problem</h2>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             At 10,000 deploys per day, you encounter failure modes that are statistically
             invisible at lower volumes. A 0.01% failure rate is noise at 100 deploys per day.
             At 10,000, it is 1 guaranteed bad deployment per day. At 100,000, it is 10.
           </p>
-          <p>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             The specific failure modes we catalogued in our incident post-mortems across
             2025 fell into three categories:
           </p>
@@ -143,14 +143,14 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
             ))}
           </ul>
 
-          <h2 id="solution">Our solution</h2>
-          <p>
+          <h2 id="solution" className="text-3xl font-bold tracking-[-0.02em] text-fg mt-12 mb-6">Our solution</h2>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             We built a deployment sequencer that treats each of these failure modes as a first-class
             concern. Instead of a simple rolling restart, every deployment goes through a five-phase
             protocol that we call DRAIN-STAGE-CANARY-VALIDATE-PROMOTE.
           </p>
 
-          <pre><code>{`// Deployment configuration
+          <pre className="bg-bg-secondary border border-border rounded-xl p-6 overflow-x-auto text-sm font-mono leading-[1.5] text-fg-muted my-8"><code>{`// Deployment configuration
 export const deploymentConfig = {
   strategy: "canary",
   phases: [
@@ -166,22 +166,22 @@ export const deploymentConfig = {
   }
 };`}</code></pre>
 
-          <h2 id="implementation">Implementation details</h2>
-          <p>
+          <h2 id="implementation" className="text-3xl font-bold tracking-[-0.02em] text-fg mt-12 mb-6">Implementation details</h2>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             The DRAIN phase is the most critical and the most commonly skipped in naive implementations.
             Before we bring up a single new replica, we send a SIGTERM to the load balancer to stop
             routing new connections to any instance that will be replaced. We then wait for the
             connection count to reach zero before proceeding.
           </p>
-          <p>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             The canary phase uses our internal statistical significance engine, which continuously
             monitors 23 metrics across the canary cohort versus the stable cohort. We use a
             sequential probability ratio test (SPRT) that allows us to declare the deployment safe
             or unsafe without waiting for a fixed sample size.
           </p>
 
-          <h2 id="results">Results</h2>
-          <p>
+          <h2 id="results" className="text-3xl font-bold tracking-[-0.02em] text-fg mt-12 mb-6">Results</h2>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             After deploying this architecture across our entire platform and exposing it to customers
             in our Enterprise tier in Q1 2026, we saw the following results:
           </p>
@@ -211,13 +211,13 @@ export const deploymentConfig = {
             ))}
           </div>
 
-          <h2 id="conclusion">Conclusion</h2>
-          <p>
+          <h2 id="conclusion" className="text-3xl font-bold tracking-[-0.02em] text-fg mt-12 mb-6">Conclusion</h2>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             Zero-downtime deployments at scale are not an infrastructure problem — they are a
             systems thinking problem. The tooling is secondary. The first requirement is an accurate
             mental model of every failure mode your system can exhibit during a deploy.
           </p>
-          <p>
+          <p className="text-lg leading-[1.7] text-fg-muted mb-6">
             We are continuing to improve the statistical engine behind our canary analysis
             and plan to open-source the SPRT implementation in Q3 2026.
           </p>

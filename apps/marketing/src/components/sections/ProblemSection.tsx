@@ -41,65 +41,43 @@ const itemVariants: any = {
 
 export default function ProblemSection() {
   return (
-    <section className="section problem-section" id="problem">
+    <section className="py-[var(--spacing-section-py)]" id="problem">
       <div className="container">
-        <div style={{ marginBottom: "2rem" }}>
-          <p className="text-eyebrow">The Problem</p>
+        <div className="mb-8">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3">The Problem</p>
         </div>
-        <h2 className="text-display-sm" style={{ marginBottom: "5rem", maxWidth: "700px" }}>
+        <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-20 max-w-[700px]">
           Modern infrastructure is broken.
         </h2>
 
         {problems.map((p, i) => (
           <motion.div
             key={p.number}
-            className={`problem-item ${i % 2 === 1 ? "reverse" : ""}`}
+            className={`grid grid-cols-2 max-lg:grid-cols-1 gap-16 max-lg:gap-8 items-center py-20 border-b border-border last:border-none ${i % 2 === 1 ? "[direction:rtl] max-lg:[direction:ltr] [&>*]:[direction:ltr]" : ""}`}
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
             <motion.div variants={itemVariants}>
-              <p className="number">{p.number}</p>
+              <p className="text-9xl font-extrabold leading-none tracking-[-0.04em] text-border-strong">{p.number}</p>
             </motion.div>
             <div>
               <motion.h3
                 variants={itemVariants}
-                className="problem-title"
-                style={{
-                  fontSize: "var(--text-4xl)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.025em",
-                  lineHeight: 1.15,
-                  marginBottom: "1.25rem",
-                }}
+                className="text-4xl font-bold tracking-[-0.025em] leading-[1.15] mb-5"
               >
                 {p.title}
               </motion.h3>
               <motion.p
                 variants={itemVariants}
-                className="problem-body"
-                style={{
-                  fontSize: "var(--text-lg)",
-                  color: "var(--fg-muted)",
-                  lineHeight: 1.7,
-                  marginBottom: "1rem",
-                  maxWidth: "540px",
-                }}
+                className="text-lg text-fg-muted leading-[1.7] mb-4 max-w-[540px]"
               >
                 {p.body}
               </motion.p>
               <motion.p
                 variants={itemVariants}
-                className="problem-detail"
-                style={{
-                  fontSize: "var(--text-sm)",
-                  color: "var(--fg-subtle)",
-                  lineHeight: 1.7,
-                  maxWidth: "480px",
-                  borderLeft: "1px solid var(--border-strong)",
-                  paddingLeft: "1rem",
-                }}
+                className="text-sm text-fg-subtle leading-[1.7] max-w-[480px] border-l border-border-strong pl-4"
               >
                 {p.detail}
               </motion.p>

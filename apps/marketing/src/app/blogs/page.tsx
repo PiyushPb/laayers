@@ -102,79 +102,81 @@ export default function BlogPage() {
   return (
     <div>
       {/* Blog Hero */}
-      <section className="blog-hero">
-        <div className="container blog-hero-header">
-          <h1 className="blog-hero-title">Journal</h1>
+      <section className="pt-40 pb-20 max-md:pt-32">
+        <div className="container flex justify-between items-end mb-16">
+          <h1 className="text-[clamp(3rem,8vw,6rem)] leading-[0.9] tracking-[-0.04em] font-bold text-fg">Journal</h1>
         </div>
 
         {/* Featured Article */}
-        <div className="blog-hero-featured">
-          <Link href={`/blogs/${featuredArticle.slug}`} className="blog-hero-image" style={{ textDecoration: "none" }}>
-            <div style={{
-              position: "absolute",
-              inset: 0,
-              background: "var(--bg-tertiary)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              {/* Abstract composition placeholder */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", padding: "3rem", width: "100%" }}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} style={{
-                    height: "2px",
-                    width: `${30 + i * 12}%`,
-                    background: "var(--border-strong)",
-                    borderRadius: "1px",
-                  }} />
-                ))}
+        <div className="container">
+          <div className="grid grid-cols-[3fr_2fr] gap-12 items-center bg-bg-secondary p-4 rounded-[2rem] border border-border transition-colors duration-300 hover:bg-border/50 hover:border-border-strong max-lg:grid-cols-1 max-lg:p-6 max-lg:gap-8">
+            <Link href={`/blogs/${featuredArticle.slug}`} className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-bg border border-border" style={{ textDecoration: "none" }}>
+              <div style={{
+                position: "absolute",
+                inset: 0,
+                background: "var(--bg-tertiary)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                {/* Abstract composition placeholder */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", padding: "3rem", width: "100%" }}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} style={{
+                      height: "2px",
+                      width: `${30 + i * 12}%`,
+                      background: "var(--border-strong)",
+                      borderRadius: "1px",
+                    }} />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div style={{
-              position: "absolute",
-              top: "1.5rem",
-              left: "1.5rem",
-              background: "rgba(10,10,10,0.8)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid var(--border-strong)",
-              borderRadius: "2px",
-              padding: "0.25rem 0.6rem",
-              fontSize: "var(--text-xs)",
-              fontWeight: 500,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--fg)",
-            }}>
-              Featured
-            </div>
-          </Link>
-
-          <div className="blog-hero-content">
-            <div className="blog-hero-meta">
-              <span className="blog-category-tag">{featuredArticle.category}</span>
-              <span className="blog-read-time">{featuredArticle.readTime}</span>
-            </div>
-            <h2 className="blog-hero-article-title">
-              <Link href={`/blogs/${featuredArticle.slug}`} style={{ color: "inherit", textDecoration: "none" }}>
-                {featuredArticle.title}
-              </Link>
-            </h2>
-            <p className="blog-excerpt">{featuredArticle.excerpt}</p>
-            <div className="blog-author">
-              <div className="blog-author-avatar" />
-              <div>
-                <div className="blog-author-name">{featuredArticle.author}</div>
-                <div className="blog-author-date">{featuredArticle.date}</div>
+              <div style={{
+                position: "absolute",
+                top: "1.5rem",
+                left: "1.5rem",
+                background: "rgba(10,10,10,0.8)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid var(--border-strong)",
+                borderRadius: "2px",
+                padding: "0.25rem 0.6rem",
+                fontSize: "var(--text-xs)",
+                fontWeight: 500,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--fg)",
+              }}>
+                Featured
               </div>
-            </div>
-            <Link
-              href={`/blogs/${featuredArticle.slug}`}
-              className="btn btn-secondary"
-              style={{ marginTop: "2rem", width: "fit-content" }}
-            >
-              Read article
-              <ArrowRight size={14} />
             </Link>
+
+            <div className="pr-8 max-lg:pr-0">
+              <div className="flex items-center gap-4 mb-6 font-mono text-sm">
+                <span className="px-2 py-1 rounded border border-border-strong text-fg font-medium tracking-[0.05em] uppercase">{featuredArticle.category}</span>
+                <span className="text-fg-subtle">{featuredArticle.readTime}</span>
+              </div>
+              <h2 className="text-4xl font-semibold tracking-[-0.02em] leading-[1.1] mb-6 text-fg">
+                <Link href={`/blogs/${featuredArticle.slug}`} style={{ color: "inherit", textDecoration: "none" }}>
+                  {featuredArticle.title}
+                </Link>
+              </h2>
+              <p className="text-lg text-fg-muted mb-8 leading-[1.6]">{featuredArticle.excerpt}</p>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-border" />
+                <div>
+                  <div className="font-semibold text-fg">{featuredArticle.author}</div>
+                  <div className="text-sm text-fg-muted">{featuredArticle.date}</div>
+                </div>
+              </div>
+              <Link
+                href={`/blogs/${featuredArticle.slug}`}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-medium text-base transition-all duration-300 bg-bg border border-border text-fg hover:bg-bg-secondary hover:border-border-strong active:scale-[0.98]"
+                style={{ marginTop: "2rem", width: "fit-content" }}
+              >
+                Read article
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -182,11 +184,11 @@ export default function BlogPage() {
       {/* Category Filter */}
       <section style={{ paddingBlock: "3rem", borderBottom: "1px solid var(--border)" }}>
         <div className="container">
-          <div className="category-nav">
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 hide-scrollbar">
             {categories.map((cat) => (
               <button
                 key={cat}
-                className={`category-btn ${activeCategory === cat ? "active" : ""}`}
+                className={`px-4 py-2 rounded-full border border-border bg-bg text-fg-muted font-medium text-sm transition-all duration-200 whitespace-nowrap hover:bg-bg-secondary hover:text-fg hover:border-border-strong ${activeCategory === cat ? "bg-fg text-bg border-fg" : ""}`}
                 onClick={() => setActiveCategory(cat)}
               >
                 {cat}
@@ -197,12 +199,12 @@ export default function BlogPage() {
       </section>
 
       {/* Article Grid */}
-      <section className="section">
+      <section className="py-[var(--spacing-section-py)]">
         <div className="container">
-          <div className="blog-grid">
+          <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:grid-cols-1">
             {regularArticles.map((article) => (
-              <Link key={article.slug} href={`/blogs/${article.slug}`} className="blog-card">
-                <div className="blog-card-image">
+              <Link key={article.slug} href={`/blogs/${article.slug}`} className="flex flex-col group text-left cursor-pointer" style={{ textDecoration: "none" }}>
+                <div className="relative aspect-[3/2] rounded-[1.5rem] overflow-hidden bg-bg-secondary mb-6 border border-border transition-colors duration-300 group-hover:border-border-strong">
                   {/* Abstract image placeholder */}
                   <div style={{
                     position: "absolute",
@@ -225,18 +227,18 @@ export default function BlogPage() {
                     </div>
                   </div>
                 </div>
-                <div className="blog-card-body">
-                  <div className="blog-hero-meta" style={{ marginBottom: 0 }}>
-                    <span className="blog-category-tag">{article.category}</span>
-                    <span className="blog-read-time">{article.readTime}</span>
+                <div className="flex flex-col flex-1">
+                  <div className="flex items-center gap-4 mb-3 font-mono text-sm" style={{ marginBottom: 12 }}>
+                    <span className="px-2 py-1 rounded border border-border-strong text-fg font-medium tracking-[0.05em] uppercase">{article.category}</span>
+                    <span className="text-fg-subtle">{article.readTime}</span>
                   </div>
-                  <h3 className="blog-card-title">{article.title}</h3>
-                  <p className="blog-card-excerpt">{article.excerpt}</p>
-                  <div className="blog-author">
-                    <div className="blog-author-avatar" />
+                  <h3 className="text-2xl font-semibold tracking-[-0.02em] leading-[1.2] mb-3 text-fg group-hover:text-fg-subtle transition-colors duration-200">{article.title}</h3>
+                  <p className="text-base text-fg-muted mb-6 leading-[1.6] flex-1">{article.excerpt}</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-border" />
                     <div>
-                      <div className="blog-author-name">{article.author}</div>
-                      <div className="blog-author-date">{article.date}</div>
+                      <div className="font-semibold text-fg">{article.author}</div>
+                      <div className="text-sm text-fg-muted">{article.date}</div>
                     </div>
                   </div>
                 </div>
@@ -248,12 +250,12 @@ export default function BlogPage() {
 
       {/* Newsletter */}
       <section style={{ paddingBlock: "6rem", borderTop: "1px solid var(--border)", background: "var(--bg-secondary)" }}>
-        <div className="container-narrow" style={{ textAlign: "center" }}>
-          <p className="text-eyebrow" style={{ marginBottom: "1.5rem" }}>Newsletter</p>
-          <h2 className="text-display-sm" style={{ marginBottom: "1rem" }}>
+        <div className="container-narrow" style={{ textAlign: "center", maxWidth: "800px", margin: "0 auto", padding: "0 1.5rem" }}>
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle mb-6">Newsletter</p>
+          <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-4">
             Stay sharp.
           </h2>
-          <p className="text-subheading" style={{ marginBottom: "3rem" }}>
+          <p className="text-2xl text-fg-muted mb-12 max-w-[560px] mx-auto leading-[1.4]">
             Engineering insights, product updates, and deep technical writing.
             Once a week, no more.
           </p>
@@ -261,10 +263,10 @@ export default function BlogPage() {
             <input
               type="email"
               placeholder="your@company.com"
-              className="footer-input"
+              className="bg-bg border border-border px-4 py-3 rounded-l-lg text-fg placeholder:text-fg-subtle focus:outline-none focus:border-border-strong"
               style={{ flex: 1 }}
             />
-            <button className="footer-input-btn">Subscribe</button>
+            <button className="bg-fg text-bg px-6 py-3 rounded-r-lg font-medium hover:bg-fg/90 transition-colors">Subscribe</button>
           </div>
         </div>
       </section>

@@ -44,23 +44,23 @@ const codeLineVariants: any = {
 
 export default function ShowcaseSection() {
   return (
-    <section className="section showcase-section" id="showcase">
+    <section className="py-[var(--spacing-section-py)] bg-bg-secondary border-y border-border" id="showcase">
       <div className="container">
-        <p className="text-eyebrow" style={{ marginBottom: "2rem" }}>Product</p>
+        <p className="text-xs font-medium tracking-[0.15em] uppercase text-fg-subtle border-l-2 border-border-strong pl-3 mb-8">Product</p>
 
-        <div className="showcase-grid showcase-grid--top">
+        <div className="grid grid-cols-2 max-lg:grid-cols-1 gap-20 max-lg:gap-12 items-center mb-20 max-lg:mb-12">
           <div>
-            <h2 className="text-display-sm" style={{ marginBottom: "1.5rem" }}>
+            <h2 className="text-6xl font-bold leading-[1.05] tracking-[-0.025em] text-fg mb-6">
               A dashboard for every layer.
             </h2>
-            <p className="text-subheading" style={{ marginBottom: "2rem" }}>
+            <p className="text-xl font-normal leading-[1.6] text-fg-muted mb-8">
               From your CI pipeline to production traffic — one interface that makes
               the entire lifecycle visible and controllable.
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <div className="flex flex-col gap-3">
               {["Real-time deployment tracking", "Service dependency graph", "Environment diff viewer", "Incident timeline"].map((item) => (
-                <div key={item} style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "var(--text-sm)", color: "var(--fg-muted)" }}>
-                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "var(--fg-subtle)", flexShrink: 0 }} />
+                <div key={item} className="flex items-center gap-3 text-sm text-fg-muted">
+                  <div className="w-1 h-1 rounded-full bg-fg-subtle shrink-0" />
                   {item}
                 </div>
               ))}
@@ -69,55 +69,38 @@ export default function ShowcaseSection() {
 
           {/* Browser mockup */}
           <motion.div 
-            className="showcase-browser"
+            className="border border-border-strong rounded-xl overflow-hidden bg-bg relative max-lg:mx-0 max-lg:rounded-lg"
             variants={browserVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <div className="browser-bar">
-              <div className="browser-dots">
-                <div className="browser-dot" />
-                <div className="browser-dot" />
-                <div className="browser-dot" />
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-bg-secondary">
+              <div className="flex gap-[6px]">
+                <div className="w-2.5 h-2.5 rounded-full bg-border-strong" />
+                <div className="w-2.5 h-2.5 rounded-full bg-border-strong" />
+                <div className="w-2.5 h-2.5 rounded-full bg-border-strong" />
               </div>
-              <div className="browser-tab">app.laayers.com</div>
+              <div className="bg-bg-tertiary border border-border rounded px-3 py-1 text-[11px] text-fg-subtle font-mono ml-4">app.laayers.com</div>
             </div>
-            <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem", minHeight: "320px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "0.75rem" }}>
+            <div className="p-6 flex flex-col gap-4 min-h-[320px]">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-3">
                 {["Deployments", "Uptime", "Incidents"].map((stat, i) => (
-                  <div key={stat} style={{
-                    background: "var(--bg-secondary)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "6px",
-                    padding: "1rem",
-                  }}>
-                    <div style={{ fontSize: "10px", color: "var(--fg-subtle)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>{stat}</div>
-                    <div style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.03em" }}>
+                  <div key={stat} className="bg-bg-secondary border border-border rounded-md p-4">
+                    <div className="text-[10px] text-fg-subtle uppercase tracking-[0.1em] mb-2">{stat}</div>
+                    <div className="text-2xl font-bold tracking-[-0.03em]">
                       {i === 0 ? "247" : i === 1 ? "99.97%" : "0"}
                     </div>
                   </div>
                 ))}
               </div>
-              <div style={{
-                background: "var(--bg-secondary)",
-                border: "1px solid var(--border)",
-                borderRadius: "6px",
-                padding: "1rem",
-                flex: 1,
-              }}>
-                <div style={{ fontSize: "10px", color: "var(--fg-subtle)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1rem" }}>
+              <div className="bg-bg-secondary border border-border rounded-md p-4 flex-1 flex flex-col">
+                <div className="text-[10px] text-fg-subtle uppercase tracking-[0.1em] mb-4">
                   Deployment Timeline — Last 30d
                 </div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: "80px" }}>
+                <div className="flex items-end gap-1 h-[80px]">
                   {[60, 80, 45, 90, 70, 85, 95, 65, 75, 88, 92, 78, 82, 95, 100].map((h, i) => (
-                    <div key={i} style={{
-                      flex: 1,
-                      height: `${h}%`,
-                      background: "var(--border-strong)",
-                      borderRadius: "2px",
-                      opacity: i === 14 ? 1 : 0.4,
-                    }} />
+                    <div key={i} className={`flex-1 bg-border-strong rounded-sm ${i === 14 ? 'opacity-100' : 'opacity-40'}`} style={{ height: `${h}%` }} />
                   ))}
                 </div>
               </div>
@@ -126,45 +109,45 @@ export default function ShowcaseSection() {
         </div>
 
         {/* Code section */}
-        <div className="showcase-grid showcase-grid--bottom">
+        <div className="grid grid-cols-2 max-lg:grid-cols-1 gap-20 max-lg:gap-12 items-center">
           <motion.div 
-            className="code-snippet"
+            className="bg-bg border border-border rounded-lg p-6 font-mono text-[13px] leading-[1.8] text-fg-muted overflow-x-auto max-lg:text-[12px]"
             variants={codeContainerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
             {codeLines.map((line, i) => (
-              <motion.div key={i} className="code-line" variants={codeLineVariants}>
+              <motion.div key={i} variants={codeLineVariants}>
                 {line.type === "comment" && (
-                  <span className="comment">{line.text}</span>
+                  <span className="text-zinc-700">{line.text}</span>
                 )}
                 {line.type === "keyword" && (
                   <>
-                    <span className="keyword">{line.text}</span>
+                    <span className="text-fg font-medium">{line.text}</span>
                     <span>{line.after}</span>
                   </>
                 )}
                 {line.type === "normal" && <span>{line.text || "\u00A0"}</span>}
                 {line.type === "string" && (
-                  <span className="string">{line.text}</span>
+                  <span className="text-zinc-400">{line.text}</span>
                 )}
               </motion.div>
             ))}
           </motion.div>
 
           <div>
-            <h2 className="text-headline" style={{ marginBottom: "1.5rem" }}>
+            <h2 className="text-4xl font-semibold leading-[1.15] tracking-[-0.02em] text-fg mb-6">
               Built for how engineers actually work.
             </h2>
-            <p className="text-subheading" style={{ fontSize: "var(--text-base)", marginBottom: "2rem" }}>
+            <p className="text-base font-normal leading-[1.6] text-fg-muted mb-8">
               A full CLI that mirrors everything in the UI. Scriptable, pipeable, and
               composable. First-class TypeScript SDK included.
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <div className="flex flex-col gap-3">
               {["Zero config for common patterns", "Full programmatic control", "Webhooks for every event", "Terraform and Pulumi providers"].map((item) => (
-                <div key={item} style={{ display: "flex", alignItems: "center", gap: "0.75rem", fontSize: "var(--text-sm)", color: "var(--fg-muted)" }}>
-                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "var(--fg-subtle)", flexShrink: 0 }} />
+                <div key={item} className="flex items-center gap-3 text-sm text-fg-muted">
+                  <div className="w-1 h-1 rounded-full bg-fg-subtle shrink-0" />
                   {item}
                 </div>
               ))}
