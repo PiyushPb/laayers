@@ -47,10 +47,10 @@ export default function Header() {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
         <div
-          className={`mx-auto transition-all duration-500 ${
+          className={`mx-auto transition-all duration-500 border ${
             isScrolled
-              ? "mx-4 mt-4 max-w-6xl rounded-2xl bg-bg/80 border border-border px-6 py-3 shadow-lg backdrop-blur-2xl lg:mx-auto"
-              : "max-w-7xl px-6 py-5 lg:px-10"
+              ? "mx-4 mt-4 max-w-6xl rounded-2xl bg-bg/80 border-border px-6 py-3 shadow-lg backdrop-blur-2xl lg:mx-auto"
+              : "max-w-7xl border-transparent px-6 py-5 lg:px-10"
           }`}
         >
           <nav

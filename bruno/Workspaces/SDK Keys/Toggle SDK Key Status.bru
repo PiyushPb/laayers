@@ -1,0 +1,23 @@
+meta {
+  name: Toggle SDK Key Status
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys/:keyId/enable
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  keyId: 
+}

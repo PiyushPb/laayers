@@ -1,0 +1,25 @@
+meta {
+  name: Update Subscription
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/billing/subscription
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "taxId": "..."
+  }
+}

@@ -6,7 +6,8 @@ export const workspaceDomains = pgTable('workspace_domains', {
   id: text('id').primaryKey().$defaultFn(() => createId()),
   workspaceId: text('workspace_id').notNull().references(() => workspaces.id, { onDelete: 'cascade' }),
   domain: text('domain').notNull(),
-  verified: boolean('verified').default(false).notNull(),
+  status: text('status').default('pending').notNull(), // pending, verified, failed
+  verificationToken: text('verification_token'),
   primary: boolean('primary').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => {

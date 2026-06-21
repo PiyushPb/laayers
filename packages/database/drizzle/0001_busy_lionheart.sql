@@ -1,1 +1,0 @@
-ALTER TABLE "workspace_modules" ADD COLUMN "plan" text DEFAULT 'free' NOT NULL;

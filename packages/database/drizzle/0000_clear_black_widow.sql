@@ -126,7 +126,8 @@ CREATE TABLE IF NOT EXISTS "workspace_domains" (
 	"id" text PRIMARY KEY NOT NULL,
 	"workspace_id" text NOT NULL,
 	"domain" text NOT NULL,
-	"verified" boolean DEFAULT false NOT NULL,
+	"status" text DEFAULT 'pending' NOT NULL,
+	"verification_token" text,
 	"primary" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
@@ -134,16 +135,22 @@ CREATE TABLE IF NOT EXISTS "workspace_domains" (
 CREATE TABLE IF NOT EXISTS "workspace_sdk_keys" (
 	"id" text PRIMARY KEY NOT NULL,
 	"workspace_id" text NOT NULL,
-	"public_key" text NOT NULL,
-	"secret_key" text NOT NULL,
+	"name" text NOT NULL,
+	"prefix" text NOT NULL,
+	"hash" text NOT NULL,
+	"environment" text NOT NULL,
+	"scopes" jsonb DEFAULT '[]' NOT NULL,
+	"status" text DEFAULT 'active' NOT NULL,
+	"last_used_at" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "workspace_sdk_keys_public_key_unique" UNIQUE("public_key")
+	CONSTRAINT "workspace_sdk_keys_hash_unique" UNIQUE("hash")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "workspace_modules" (
 	"id" text PRIMARY KEY NOT NULL,
 	"workspace_id" text NOT NULL,
 	"module_key" text NOT NULL,
+	"plan" text DEFAULT 'free' NOT NULL,
 	"enabled" boolean DEFAULT false NOT NULL,
 	"config" jsonb DEFAULT '{}'::jsonb
 );
@@ -171,12 +178,30 @@ CREATE TABLE IF NOT EXISTS "workspace_invitations" (
 CREATE TABLE IF NOT EXISTS "audit_logs" (
 	"id" text PRIMARY KEY NOT NULL,
 	"workspace_id" text NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" text,
+	"actor_type" text DEFAULT 'user' NOT NULL,
 	"action" text NOT NULL,
 	"entity_type" text NOT NULL,
 	"entity_id" text NOT NULL,
+	"old_value" jsonb,
+	"new_value" jsonb,
 	"metadata" jsonb DEFAULT '{}' NOT NULL,
+	"ip_address" text,
+	"user_agent" text,
 	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "workspace_subscriptions" (
+	"id" text PRIMARY KEY NOT NULL,
+	"workspace_id" text NOT NULL,
+	"cluster_id" text,
+	"plan_id" text NOT NULL,
+	"status" text DEFAULT 'active' NOT NULL,
+	"current_period_start" timestamp,
+	"current_period_end" timestamp,
+	"cancel_at_period_end" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -282,7 +307,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "workspace_subscriptions" ADD CONSTRAINT "workspace_subscriptions_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

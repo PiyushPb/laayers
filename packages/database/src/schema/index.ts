@@ -15,3 +15,4 @@ export * from './workspace-modules';
 export * from './workspace-quotas';
 export * from './workspace-invitations';
 export * from './auditLogs';
+export * from './workspace-subscriptions';

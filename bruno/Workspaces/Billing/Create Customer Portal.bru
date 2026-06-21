@@ -1,18 +1,17 @@
 meta {
-  name: Verify Domain
+  name: Create Customer Portal
   type: http
-  seq: 5
+  seq: 1
 }
 
 post {
-  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/verify
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/billing/customer-portal
   body: none
   auth: bearer
 }
 
 params:path {
   workspaceId: {{workspaceId}}
-  domainId: w2yrqru5rkb73qoczlee51n9
 }
 
 auth:bearer {

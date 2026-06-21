@@ -1,0 +1,27 @@
+meta {
+  name: Create SDK Key
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Production Key",
+    "environment": "production",
+    "scopes": []
+  }
+}

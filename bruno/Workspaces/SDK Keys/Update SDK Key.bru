@@ -1,0 +1,29 @@
+meta {
+  name: Update SDK Key
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys/:keyId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  keyId: 
+}
+body:json {
+  {
+    "name": "Updated Key Name",
+    "scopes": []
+  }
+}

@@ -1,97 +1,265 @@
 import { Request, Response } from 'express';
 import { db, workspaceSdkKeys, auditLogs } from '@layers/database';
-import { eq } from 'drizzle-orm';
-import { sendSuccess } from '@layers/shared';
+import { eq, and } from 'drizzle-orm';
+import { sendSuccess, NotFoundError, ValidationError } from '@layers/shared';
 import crypto from 'crypto';
 
-export const getSdkKeys = async (req: Request, res: Response) => {
-  const [keys] = await db
-    .select()
-    .from(workspaceSdkKeys)
-    .where(eq(workspaceSdkKeys.workspaceId, req.workspace.id))
-    .limit(1);
+const hashKey = (key: string) => crypto.createHash('sha256').update(key).digest('hex');
 
-  if (!keys) {
-    // If somehow not initialized, generate now
-    const newPub = `pk_${crypto.randomBytes(16).toString('hex')}`;
-    const newSec = `sk_${crypto.randomBytes(32).toString('hex')}`;
-    const [inserted] = await db
+export const getSdkKeys = async (req: Request, res: Response) => {
+  const keys = await db
+    .select({
+      id: workspaceSdkKeys.id,
+      name: workspaceSdkKeys.name,
+      prefix: workspaceSdkKeys.prefix,
+      environment: workspaceSdkKeys.environment,
+      scopes: workspaceSdkKeys.scopes,
+      status: workspaceSdkKeys.status,
+      lastUsedAt: workspaceSdkKeys.lastUsedAt,
+      createdAt: workspaceSdkKeys.createdAt,
+    })
+    .from(workspaceSdkKeys)
+    .where(eq(workspaceSdkKeys.workspaceId, req.workspace.id));
+
+  res.status(200).json(sendSuccess({ keys }));
+};
+
+export const createSdkKey = async (req: Request, res: Response) => {
+  const { name, environment, scopes = [] } = req.body;
+
+  const envPrefix = environment === 'production' ? 'prod' : environment === 'preview' ? 'prev' : 'dev';
+  const rawKey = `lyr_${envPrefix}_${crypto.randomBytes(32).toString('hex')}`;
+  const prefix = rawKey.substring(0, 15);
+  const hash = hashKey(rawKey);
+
+  const result = await db.transaction(async (tx) => {
+    const [newKey] = await tx
       .insert(workspaceSdkKeys)
       .values({
         workspaceId: req.workspace.id,
-        publicKey: newPub,
-        secretKey: newSec,
+        name,
+        prefix,
+        hash,
+        environment,
+        scopes,
+        status: 'active',
       })
       .returning();
 
-    return res.status(200).json(sendSuccess({
-      publicKey: inserted.publicKey,
-      secretKey: `sk_••••••••••••••••••••••••••••••••${inserted.secretKey.slice(-4)}`,
-    }));
-  }
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      actorType: 'user',
+      userId: req.user.id,
+      action: 'workspace.sdk_key.created',
+      entityType: 'sdk_key',
+      entityId: newKey.id,
+      newValue: { name, environment, prefix },
+    });
 
-  res.status(200).json(sendSuccess({
-    publicKey: keys.publicKey,
-    secretKey: `sk_••••••••••••••••••••••••••••••••${keys.secretKey.slice(-4)}`,
-  }));
+    return newKey;
+  });
+
+  res.status(201).json(sendSuccess({
+    key: { ...result, hash: undefined },
+    rawKey // Displayed ONLY ONCE
+  }, 'SDK Key created successfully'));
+};
+
+export const getSdkKeyDetails = async (req: Request, res: Response) => {
+  const { keyId } = req.params;
+  const [key] = await db
+    .select({
+      id: workspaceSdkKeys.id,
+      name: workspaceSdkKeys.name,
+      prefix: workspaceSdkKeys.prefix,
+      environment: workspaceSdkKeys.environment,
+      scopes: workspaceSdkKeys.scopes,
+      status: workspaceSdkKeys.status,
+      lastUsedAt: workspaceSdkKeys.lastUsedAt,
+      createdAt: workspaceSdkKeys.createdAt,
+    })
+    .from(workspaceSdkKeys)
+    .where(and(eq(workspaceSdkKeys.id, keyId), eq(workspaceSdkKeys.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!key) throw new NotFoundError('SDK Key not found');
+  res.status(200).json(sendSuccess({ key }));
+};
+
+export const updateSdkKey = async (req: Request, res: Response) => {
+  const { keyId } = req.params;
+  const { name, scopes } = req.body;
+
+  const [key] = await db
+    .select()
+    .from(workspaceSdkKeys)
+    .where(and(eq(workspaceSdkKeys.id, keyId), eq(workspaceSdkKeys.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!key) throw new NotFoundError('SDK Key not found');
+
+  const [updated] = await db.transaction(async (tx) => {
+    const [updatedKey] = await tx
+      .update(workspaceSdkKeys)
+      .set({
+        name: name !== undefined ? name : key.name,
+        scopes: scopes !== undefined ? scopes : key.scopes,
+      })
+      .where(eq(workspaceSdkKeys.id, keyId))
+      .returning({
+        id: workspaceSdkKeys.id,
+        name: workspaceSdkKeys.name,
+        prefix: workspaceSdkKeys.prefix,
+        environment: workspaceSdkKeys.environment,
+        scopes: workspaceSdkKeys.scopes,
+        status: workspaceSdkKeys.status,
+      });
+
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      actorType: 'user',
+      userId: req.user.id,
+      action: 'workspace.sdk_key.updated',
+      entityType: 'sdk_key',
+      entityId: keyId,
+      oldValue: { name: key.name, scopes: key.scopes },
+      newValue: { name: updatedKey.name, scopes: updatedKey.scopes },
+    });
+
+    return [updatedKey];
+  });
+
+  res.status(200).json(sendSuccess({ key: updated }, 'SDK Key updated successfully'));
+};
+
+export const deleteSdkKey = async (req: Request, res: Response) => {
+  const { keyId } = req.params;
+
+  const [key] = await db
+    .select()
+    .from(workspaceSdkKeys)
+    .where(and(eq(workspaceSdkKeys.id, keyId), eq(workspaceSdkKeys.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!key) throw new NotFoundError('SDK Key not found');
+
+  await db.transaction(async (tx) => {
+    await tx.delete(workspaceSdkKeys).where(eq(workspaceSdkKeys.id, keyId));
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      actorType: 'user',
+      userId: req.user.id,
+      action: 'workspace.sdk_key.deleted',
+      entityType: 'sdk_key',
+      entityId: keyId,
+      oldValue: { name: key.name, prefix: key.prefix },
+    });
+  });
+
+  res.status(200).json(sendSuccess(null, 'SDK Key deleted successfully'));
 };
 
 export const rotateSdkKeys = async (req: Request, res: Response) => {
-  const newPub = `pk_${crypto.randomBytes(16).toString('hex')}`;
-  const newSec = `sk_${crypto.randomBytes(32).toString('hex')}`;
+  const { keyId } = req.params;
 
-  const [keys] = await db
+  const [key] = await db
     .select()
     .from(workspaceSdkKeys)
-    .where(eq(workspaceSdkKeys.workspaceId, req.workspace.id))
+    .where(and(eq(workspaceSdkKeys.id, keyId), eq(workspaceSdkKeys.workspaceId, req.workspace.id)))
     .limit(1);
 
-  if (!keys) {
-    const [inserted] = await db
-      .insert(workspaceSdkKeys)
-      .values({
-        workspaceId: req.workspace.id,
-        publicKey: newPub,
-        secretKey: newSec,
-      })
-      .returning();
+  if (!key) throw new NotFoundError('SDK Key not found');
 
-    await db.insert(auditLogs).values({
+  const envPrefix = key.environment === 'production' ? 'prod' : key.environment === 'preview' ? 'prev' : 'dev';
+  const rawKey = `lyr_${envPrefix}_${crypto.randomBytes(32).toString('hex')}`;
+  const prefix = rawKey.substring(0, 15);
+  const hash = hashKey(rawKey);
+
+  const [updated] = await db.transaction(async (tx) => {
+    const [rotated] = await tx
+      .update(workspaceSdkKeys)
+      .set({ hash, prefix })
+      .where(eq(workspaceSdkKeys.id, keyId))
+      .returning({
+        id: workspaceSdkKeys.id,
+        name: workspaceSdkKeys.name,
+        prefix: workspaceSdkKeys.prefix,
+        environment: workspaceSdkKeys.environment,
+      });
+
+    await tx.insert(auditLogs).values({
       workspaceId: req.workspace.id,
+      actorType: 'user',
       userId: req.user.id,
-      action: 'sdk_keys.rotated',
+      action: 'workspace.sdk_key.rotated',
       entityType: 'sdk_key',
-      entityId: req.workspace.id,
-      metadata: { publicKey: newPub },
+      entityId: keyId,
+      newValue: { prefix: rotated.prefix },
     });
 
-    // On rotation, return the full unmasked keys
-    return res.status(200).json(sendSuccess({
-      publicKey: inserted.publicKey,
-      secretKey: inserted.secretKey,
-    }, 'SDK Keys rotated successfully'));
-  }
-
-  const [updated] = await db
-    .update(workspaceSdkKeys)
-    .set({
-      publicKey: newPub,
-      secretKey: newSec,
-    })
-    .where(eq(workspaceSdkKeys.workspaceId, req.workspace.id))
-    .returning();
-
-  await db.insert(auditLogs).values({
-    workspaceId: req.workspace.id,
-    userId: req.user.id,
-    action: 'sdk_keys.rotated',
-    entityType: 'sdk_key',
-    entityId: req.workspace.id,
-    metadata: { publicKey: newPub },
+    return [rotated];
   });
 
-  res.status(200).json(sendSuccess({
-    publicKey: updated.publicKey,
-    secretKey: updated.secretKey,
-  }, 'SDK Keys rotated successfully'));
+  res.status(200).json(sendSuccess({ key: updated, rawKey }, 'SDK Key rotated successfully'));
+};
+
+export const revokeSdkKey = async (req: Request, res: Response) => {
+  const { keyId } = req.params;
+
+  const [key] = await db
+    .select()
+    .from(workspaceSdkKeys)
+    .where(and(eq(workspaceSdkKeys.id, keyId), eq(workspaceSdkKeys.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!key) throw new NotFoundError('SDK Key not found');
+
+  await db.transaction(async (tx) => {
+    await tx.update(workspaceSdkKeys).set({ status: 'revoked' }).where(eq(workspaceSdkKeys.id, keyId));
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      actorType: 'user',
+      userId: req.user.id,
+      action: 'workspace.sdk_key.revoked',
+      entityType: 'sdk_key',
+      entityId: keyId,
+      oldValue: { status: key.status },
+      newValue: { status: 'revoked' },
+    });
+  });
+
+  res.status(200).json(sendSuccess(null, 'SDK Key revoked successfully'));
+};
+
+export const revealSdkKey = async (req: Request, res: Response) => {
+  throw new ValidationError('SDK Keys are securely hashed and cannot be revealed. Please rotate the key if you have lost it.');
+};
+
+export const toggleSdkKeyStatus = async (req: Request, res: Response) => {
+  const { keyId, action } = req.params;
+  const status = action === 'enable' ? 'active' : 'disabled';
+
+  const [key] = await db
+    .select()
+    .from(workspaceSdkKeys)
+    .where(and(eq(workspaceSdkKeys.id, keyId), eq(workspaceSdkKeys.workspaceId, req.workspace.id)))
+    .limit(1);
+
+  if (!key) throw new NotFoundError('SDK Key not found');
+
+  await db.transaction(async (tx) => {
+    await tx.update(workspaceSdkKeys).set({ status }).where(eq(workspaceSdkKeys.id, keyId));
+    await tx.insert(auditLogs).values({
+      workspaceId: req.workspace.id,
+      actorType: 'user',
+      userId: req.user.id,
+      action: `workspace.sdk_key.${status}`,
+      entityType: 'sdk_key',
+      entityId: keyId,
+      oldValue: { status: key.status },
+      newValue: { status },
+    });
+  });
+
+  res.status(200).json(sendSuccess(null, `SDK Key ${status} successfully`));
 };

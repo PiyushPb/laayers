@@ -1,0 +1,23 @@
+meta {
+  name: Delete SDK Key
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys/:keyId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+params:path {
+  keyId: 
+}

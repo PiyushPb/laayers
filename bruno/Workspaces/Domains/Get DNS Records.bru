@@ -1,11 +1,11 @@
 meta {
-  name: Verify Domain
+  name: Get DNS Records
   type: http
-  seq: 5
+  seq: 1
 }
 
-post {
-  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/verify
+get {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/dns-records
   body: none
   auth: bearer
 }

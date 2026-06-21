@@ -1,0 +1,25 @@
+meta {
+  name: Change Plan
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/billing/subscription/change-plan
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "planId": "pro"
+  }
+}

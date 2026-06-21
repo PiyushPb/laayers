@@ -1,0 +1,20 @@
+meta {
+  name: Reveal SDK Key
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys/:keyId/reveal
+  body: json
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  keyId: t15o990a7270zy9buifz58az
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

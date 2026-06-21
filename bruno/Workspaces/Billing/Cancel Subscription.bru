@@ -1,18 +1,17 @@
 meta {
-  name: Verify Domain
+  name: Cancel Subscription
   type: http
-  seq: 5
+  seq: 1
 }
 
 post {
-  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/verify
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/billing/subscription/cancel
   body: none
   auth: bearer
 }
 
 params:path {
   workspaceId: {{workspaceId}}
-  domainId: w2yrqru5rkb73qoczlee51n9
 }
 
 auth:bearer {

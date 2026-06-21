@@ -4,8 +4,8 @@ import {
   switchWorkspace, getMembers, inviteMember, updateMemberRole, removeMember, transferOwnership
 } from './controllers/workspace.controller';
 import { getSettings, updateSettings } from './controllers/settings.controller';
-import { listDomains, addDomain, updateDomain, deleteDomain, verifyDomain } from './controllers/domains.controller';
-import { getSdkKeys, rotateSdkKeys } from './controllers/sdk-keys.controller';
+import { listDomains, addDomain, getDomain, updateDomain, deleteDomain, verifyDomain, setPrimaryDomain, getDnsRecords, getVerificationStatus } from './controllers/domains.controller';
+import { getSdkKeys, createSdkKey, getSdkKeyDetails, updateSdkKey, deleteSdkKey, rotateSdkKeys, revokeSdkKey, revealSdkKey, toggleSdkKeyStatus } from './controllers/sdk-keys.controller';
 import { listModules, updateModule } from './controllers/modules.controller';
 import { getQuotas } from './controllers/quotas.controller';
 import { revokeInvitation, resendInvitation } from './controllers/invitation.controller';
@@ -776,6 +776,11 @@ router.delete('/:workspaceId/domains/:domainId', requireWorkspace, requireRole([
  *         description: Domain verified successfully
  */
 router.post('/:workspaceId/domains/:domainId/verify', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(verifyDomain));
+router.get('/:workspaceId/domains/:domainId', requireWorkspace, asyncHandler(getDomain));
+router.post('/:workspaceId/domains/:domainId/set-primary', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(setPrimaryDomain));
+router.get('/:workspaceId/domains/:domainId/dns-records', requireWorkspace, asyncHandler(getDnsRecords));
+router.get('/:workspaceId/domains/:domainId/verification-status', requireWorkspace, asyncHandler(getVerificationStatus));
+
 
 // SDK Keys
 /**
@@ -822,7 +827,14 @@ router.get('/:workspaceId/sdk-keys', requireWorkspace, requireRole(['owner', 'ad
  *       200:
  *         description: Keys rotated successfully
  */
-router.post('/:workspaceId/sdk-keys/rotate', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(rotateSdkKeys));
+router.post('/:workspaceId/sdk-keys', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(createSdkKey));
+router.get('/:workspaceId/sdk-keys/:keyId', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(getSdkKeyDetails));
+router.patch('/:workspaceId/sdk-keys/:keyId', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(updateSdkKey));
+router.delete('/:workspaceId/sdk-keys/:keyId', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(deleteSdkKey));
+router.post('/:workspaceId/sdk-keys/:keyId/rotate', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(rotateSdkKeys));
+router.post('/:workspaceId/sdk-keys/:keyId/revoke', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(revokeSdkKey));
+router.post('/:workspaceId/sdk-keys/:keyId/reveal', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(revealSdkKey));
+router.post('/:workspaceId/sdk-keys/:keyId/:action(enable|disable)', requireWorkspace, requireRole(['owner', 'admin']), asyncHandler(toggleSdkKeyStatus));
 
 // Modules
 /**

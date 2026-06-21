@@ -1,12 +1,12 @@
 meta {
-  name: Verify Domain
+  name: Set Primary Domain
   type: http
-  seq: 5
+  seq: 1
 }
 
 post {
-  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/verify
-  body: none
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/domains/:domainId/set-primary
+  body: json
   auth: bearer
 }
 

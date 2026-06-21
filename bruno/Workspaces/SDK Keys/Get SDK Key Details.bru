@@ -1,0 +1,20 @@
+meta {
+  name: Get SDK Key Details
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/workspaces/:workspaceId/sdk-keys/:keyId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  workspaceId: {{workspaceId}}
+  keyId: t15o990a7270zy9buifz58az
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
